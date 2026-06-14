@@ -36,7 +36,6 @@ object VideoAppDetector {
         // ── 腾讯系 ──
         "com.tencent.weishi",                 // 微视
         "com.tencent.mv",                     // 微视极速版
-        "com.tencent.qqlive",                 // 腾讯视频 (含短视频)
 
         // ── 字节系其他 ──
         "com.ss.android.article.video",       // 西瓜视频
@@ -73,7 +72,6 @@ object VideoAppDetector {
 
         // ── 今日头条系 ──
         "com.ss.android.article.news",        // 今日头条
-        "com.ss.android.article.lite",        // 今日头条极速版
 
         // ── 腾讯新闻 ──
         "com.tencent.news",                   // 腾讯新闻
@@ -275,10 +273,6 @@ object VideoAppDetector {
         "com.player.mv",                      // MV Player
 
         // ── 国内视频播放器 ──
-        "com.tencent.qqlive",                 // 腾讯视频
-        "com.qiyi.video",                     // 爱奇艺
-        "com.youku.phone",                    // 优酷
-
         "com.sohu.sohuvideo",                 // 搜狐视频
         "com.hunantv.imgo.activity",          // 芒果TV
         "com.le123.ysdq",                     // 乐视视频

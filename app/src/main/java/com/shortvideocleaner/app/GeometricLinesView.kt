@@ -53,7 +53,7 @@ class GeometricLinesView @JvmOverloads constructor(
 
     private fun generateNodes(w: Int, h: Int) {
         nodes.clear()
-        val count = 12 + Random.nextInt(8)
+        val count = 36 + Random.nextInt(24)
         val margin = 60f
         for (i in 0 until count) {
             val x = margin + Random.nextFloat() * (w - 2 * margin)
@@ -64,9 +64,9 @@ class GeometricLinesView @JvmOverloads constructor(
             nodes.add(Node(x, y, driftAngle, driftSpeed, driftAmp))
         }
 
-        // 建立 Delaunay 式的近邻连线（简单距离阈值）
+        // 建立近邻连线
         val pairs = mutableListOf<Pair<Int, Int>>()
-        val maxDist = min(w, h) * 0.45f
+        val maxDist = min(w, h) * 0.3f
         for (i in nodes.indices) {
             for (j in i + 1 until nodes.size) {
                 val dx = nodes[i].baseX - nodes[j].baseX
@@ -158,7 +158,7 @@ class GeometricLinesView @JvmOverloads constructor(
             val (x1, y1) = positions[i]
             val (x2, y2) = positions[j]
             val dist = sqrt((x1 - x2).pow(2) + (y1 - y2).pow(2))
-            val maxDist = min(w, h) * 0.45f
+            val maxDist = min(w, h) * 0.3f
             val alpha = ((1f - dist / maxDist) * 0.5f).coerceIn(0.03f, 0.5f)
             if (alpha <= 0) continue
 

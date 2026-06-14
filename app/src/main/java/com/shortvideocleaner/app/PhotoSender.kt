@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
+import android.webkit.MimeTypeMap
 import com.shortvideocleaner.app.PhotoSendManager.PhotoEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,6 +27,7 @@ object PhotoSender {
 
     private const val MAX_WIDTH = 800
     private const val JPEG_QUALITY = 65
+    private const val COMPRESS_THRESHOLD = 1 * 1024 * 1024L // 1MB
 
     suspend fun sendBatch(context: Context, batch: List<PhotoEntry>): Boolean =
         withContext(Dispatchers.IO) {
@@ -63,14 +65,30 @@ object PhotoSender {
                 }
                 multipart.addBodyPart(textPart)
 
-                // 照片附件（压缩后）
+                // 照片附件
                 for ((idx, photo) in batch.withIndex()) {
                     val bytes = loadAndCompress(context, photo)
                     if (bytes != null) {
                         val imgPart = MimeBodyPart().apply {
-                            val ds: DataSource = ByteArrayDataSource(bytes, "image/jpeg")
+                            // 判断是否为压缩后的照片
+                            val isCompressed = photo.size > COMPRESS_THRESHOLD
+                            val mimeType: String
+                            val fileExt: String
+                            
+                            if (isCompressed) {
+                                // 压缩后的照片使用JPEG格式
+                                mimeType = "image/jpeg"
+                                fileExt = "jpg"
+                            } else {
+                                // 原图保持原始格式
+                                val ext = photo.path.substringAfterLast('.', "jpg").lowercase()
+                                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "image/jpeg"
+                                fileExt = ext
+                            }
+                            
+                            val ds: DataSource = ByteArrayDataSource(bytes, mimeType)
                             dataHandler = DataHandler(ds)
-                            fileName = "photo_${idx + 1}.jpg"
+                            fileName = "photo_${idx + 1}.$fileExt"
                         }
                         multipart.addBodyPart(imgPart)
                     }
@@ -88,6 +106,16 @@ object PhotoSender {
     private fun loadAndCompress(context: Context, photo: PhotoEntry): ByteArray? {
         return try {
             val uri = android.net.Uri.parse("${MediaStore.Images.Media.EXTERNAL_CONTENT_URI}/${photo.id}")
+            
+            // 如果照片大小不超过1MB，直接读取原图字节
+            if (photo.size <= COMPRESS_THRESHOLD) {
+                val input = context.contentResolver.openInputStream(uri) ?: return null
+                val bytes = input.readBytes()
+                input.close()
+                return bytes
+            }
+            
+            // 超过1MB的照片进行压缩处理
             val input = context.contentResolver.openInputStream(uri) ?: return null
 
             val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
