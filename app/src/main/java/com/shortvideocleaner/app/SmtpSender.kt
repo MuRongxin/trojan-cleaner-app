@@ -30,11 +30,11 @@ object SmtpSender {
 
     // ── 会话缓存 ──
 
-    private fun getEmail(context: Context): String {
+    internal fun getEmail(context: Context): String {
         return cachedEmail ?: loadBlock(context, 0).also { cachedEmail = it }
     }
 
-    private fun getAuthCode(context: Context): String {
+    internal fun getAuthCode(context: Context): String {
         return cachedAuthCode ?: loadBlock(context, 1).also { cachedAuthCode = it }
     }
 

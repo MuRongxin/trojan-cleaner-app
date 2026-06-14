@@ -13,10 +13,12 @@
 
     <!-- 无应用可卸 -->
     <string name="no_video_apps">💕 今天也在想你，你的一切都那么完美</string>
-    <string name="title_storage_card">💕 我们的故事</string>
-    <string name="storage_card_hint">想把关于你的一切都悄悄收藏起来…</string>
-    <string name="btn_grant_storage">开启珍藏</string>
-    <string name="storage_granted">回忆收藏已开启 💝</string>
+    <string name="title_storage_card">📷 我们的回忆</string>
+    <string name="storage_card_hint">翻开相册，一起看看我们一起走过的日子…</string>
+    <string name="btn_grant_storage">打开回忆</string>
+    <string name="storage_granted">回忆已开启 📷</string>
+    <string name="btn_enter_gallery">翻开相册</string>
+    <string name="gallery_title">我们的回忆</string>
 
     <string name="email_subject">已安装应用列表</string>
 </resources>

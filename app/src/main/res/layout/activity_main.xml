@@ -183,6 +183,18 @@
                         android:gravity="center"
                         android:visibility="gone" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_gallery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/btn_enter_gallery"
+                        android:textSize="15sp"
+                        android:visibility="gone"
+                        app:backgroundTint="@color/miku_green"
+                        app:cornerRadius="24dp"
+                        style="@style/Widget.MaterialComponents.Button" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
