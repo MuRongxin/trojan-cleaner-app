@@ -6,4 +6,12 @@
         <item name="colorAccent">@color/accent</item>
         <item name="android:windowBackground">@color/background</item>
     </style>
+
+    <!-- 情话页：半透明窗口，圆形展开时 MainActivity 内容透出，实现无缝覆盖 -->
+    <style name="Theme.Quote" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>

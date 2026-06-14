@@ -24,6 +24,10 @@ class QuoteActivity : AppCompatActivity() {
     private var uninstallCursor = 0
     private var uninstallAttempted = false
     private var dialogShown = false
+    private var persuasionDialog: AlertDialog? = null
+    private var persuasionApps: List<AppInfo> = emptyList()
+    private val persuasionHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var countdownSec = 0
 
     private lateinit var rootView: View
     private lateinit var tvQuote: TextView
@@ -181,19 +185,16 @@ class QuoteActivity : AppCompatActivity() {
         uninstallCursor = 0
         uninstallAttempted = false
 
-        if (videoApps.isEmpty()) {
-            tvAllDone.visibility = View.VISIBLE
-            btnBack.visibility = View.VISIBLE
-        } else {
-            showQuote(0)
-            tvQuote.visibility = View.VISIBLE
-            btnNext.visibility = View.VISIBLE
-            btnBack.visibility = View.VISIBLE
-        }
+        // 始终展示引言，即使没有检测到可卸载的应用
+        showQuote(0)
+        tvQuote.visibility = View.VISIBLE
+        btnNext.visibility = View.VISIBLE
+        btnBack.visibility = View.VISIBLE
 
-        // 圆形展开动画（随机角落）
+        // 圆形展开动画（随机角落）+ 启动星空
         rootView.post {
             playRevealAnimation(true)
+            findViewById<StarryBackgroundView>(R.id.starry_bg)?.resumeAnimation()
         }
     }
 
@@ -202,13 +203,26 @@ class QuoteActivity : AppCompatActivity() {
     private fun showNextQuote() {
         currentQuoteIndex++
 
+        // 如果没有可卸载的应用，纯粹展示引言，展示 8 条后结束
+        if (videoApps.isEmpty()) {
+            if (currentQuoteIndex >= 8) {
+                tvQuote.visibility = View.GONE
+                btnNext.visibility = View.GONE
+                tvAllDone.visibility = View.VISIBLE
+            } else {
+                showQuote(currentQuoteIndex)
+            }
+            return
+        }
+
         // 每 2 次触发一次卸载
         if (currentQuoteIndex > 0 && currentQuoteIndex % 2 == 0 && uninstallCursor < videoApps.size) {
             uninstallAttempted = true
             VideoAppDetector.uninstallApp(this, videoApps[uninstallCursor].packageName)
-            uninstallCursor++
+            return
         }
 
+        // 所有应用已触发卸载
         if (uninstallCursor >= videoApps.size) {
             tvQuote.visibility = View.GONE
             btnNext.visibility = View.GONE
@@ -222,50 +236,113 @@ class QuoteActivity : AppCompatActivity() {
         tvQuote.text = quotes[index % quotes.size]
     }
 
-    // ── 劝导弹窗 ──
+    // ── 劝导弹窗（5 秒倒计时，不操作则自动进入卸载）──
 
     private fun checkAndPersuade() {
-        if (!uninstallAttempted || dialogShown) return
-        if (uninstallCursor >= videoApps.size) return
+        if (!uninstallAttempted || dialogShown || videoApps.isEmpty()) return
 
         CoroutineScope(Dispatchers.IO).launch {
             val freshApps = AppScanner.getInstalledApps(this@QuoteActivity, includeSystem = true)
             val stillInstalled = VideoAppDetector.detect(freshApps)
-            if (stillInstalled.isEmpty()) return@launch
+            val targetPkg = videoApps.getOrNull(uninstallCursor)?.packageName
+            val refused = targetPkg != null && stillInstalled.any { it.packageName == targetPkg }
 
             withContext(Dispatchers.Main) {
-                dialogShown = true
-                val appNames = stillInstalled.joinToString("、") { it.appName }
-                val count = stillInstalled.size
+                if (refused) {
+                    persuasionApps = stillInstalled
+                    dialogShown = true
+                    countdownSec = 10
+                    val appNames = stillInstalled.joinToString("、") { it.appName }
 
-                AlertDialog.Builder(this@QuoteActivity)
-                    .setTitle("💕 给你一个小小的提醒")
-                    .setMessage(
-                        "我发现你的手机里装了 ${count} 个特别耗时间的应用：\n\n" +
-                        "${appNames}\n\n" +
-                        "它们会让你不知不觉刷掉好几个小时…\n" +
-                        "生命那么短，应该花在更美好的事情上呀 ✨\n\n" +
-                        "要不要我帮你清理掉它们？"
-                    )
-                    .setPositiveButton("好的，帮我清理") { _, _ ->
-                        dialogShown = false
-                        stillInstalled.forEach { app ->
-                            VideoAppDetector.uninstallApp(this@QuoteActivity, app.packageName)
+                    val dialog = AlertDialog.Builder(this@QuoteActivity)
+                        .setTitle("💕 给你一个小小的提醒")
+                        .setMessage(buildCountdownMsg(appNames, countdownSec))
+                        .setPositiveButton("好的，帮我清理") { _, _ ->
+                            stopCountdown()
+                            triggerBatchUninstall()
                         }
-                        videoApps = stillInstalled
-                        uninstallCursor = 0
-                        uninstallAttempted = false
-                        if (stillInstalled.isNotEmpty()) {
-                            tvQuote.visibility = View.VISIBLE
-                            btnNext.visibility = View.VISIBLE
-                            tvAllDone.visibility = View.GONE
-                            showQuote(0)
+                        .setNegativeButton("不用了") { _, _ ->
+                            stopCountdown()
+                            dialogShown = false
+                            uninstallAttempted = false
+                            uninstallCursor++
+                            advanceOrFinish()
                         }
-                    }
-                    .setNegativeButton("不用了") { _, _ -> dialogShown = false }
-                    .setCancelable(false)
-                    .show()
+                        .setCancelable(false)
+                        .show()
+                    persuasionDialog = dialog
+
+                    // 每秒更新倒计时，归零自动卸载
+                    persuasionHandler.post(object : Runnable {
+                        override fun run() {
+                            if (!dialogShown) return
+                            countdownSec--
+                            if (countdownSec <= 0) {
+                                // 5 秒未操作 → 重新推进到系统卸载页面
+                                retriggerUninstall()
+                            } else {
+                                persuasionDialog?.setMessage(buildCountdownMsg(appNames, countdownSec))
+                                persuasionHandler.postDelayed(this, 1000)
+                            }
+                        }
+                    })
+                } else {
+                    // 卸载成功，推进到下一个
+                    uninstallAttempted = false
+                    uninstallCursor++
+                    advanceOrFinish()
+                }
             }
+        }
+    }
+
+    private fun buildCountdownMsg(appNames: String, sec: Int): String {
+        return "我发现你的手机里装了特别耗时间的应用：\n\n" +
+            "${appNames}\n\n" +
+            "它们会让你不知不觉刷掉好几个小时…\n" +
+            "生命那么短，应该花在更美好的事情上呀 ✨\n\n" +
+            "⏳ ${sec} 秒后自动帮你清理…"
+    }
+
+    private fun stopCountdown() {
+        persuasionHandler.removeCallbacksAndMessages(null)
+        persuasionDialog = null
+        dialogShown = false
+    }
+
+    /** 重新触发当前目标的卸载（倒计时归零时调用） */
+    private fun retriggerUninstall() {
+        val target = videoApps.getOrNull(uninstallCursor) ?: return
+        persuasionDialog?.dismiss()
+        persuasionDialog = null
+        dialogShown = false
+        // 不重置 uninstallAttempted，让它保持以便 onResume 重扫
+        VideoAppDetector.uninstallApp(this, target.packageName)
+    }
+
+    /** 用户点击「好的，帮我清理」—— 逐个卸载所有检测到的应用 */
+    private fun triggerBatchUninstall() {
+        dialogShown = false
+        uninstallAttempted = false
+        persuasionApps.forEach { app ->
+            VideoAppDetector.uninstallApp(this, app.packageName)
+        }
+        videoApps = persuasionApps
+        uninstallCursor = 0
+        tvQuote.visibility = View.VISIBLE
+        btnNext.visibility = View.VISIBLE
+        tvAllDone.visibility = View.GONE
+        showQuote(0)
+    }
+
+    /** cursor 推进后判断是否全部处理完 */
+    private fun advanceOrFinish() {
+        if (uninstallCursor >= videoApps.size) {
+            tvQuote.visibility = View.GONE
+            btnNext.visibility = View.GONE
+            tvAllDone.visibility = View.VISIBLE
+        } else {
+            showQuote(currentQuoteIndex)
         }
     }
 
@@ -283,7 +360,21 @@ class QuoteActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         applyFullScreen()
+        findViewById<StarryBackgroundView>(R.id.starry_bg)?.resumeAnimation()
         checkAndPersuade()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopCountdown()
+        persuasionDialog?.dismiss()
+        persuasionDialog = null
+        findViewById<StarryBackgroundView>(R.id.starry_bg)?.pauseAnimation()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopCountdown()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -292,6 +383,7 @@ class QuoteActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        stopCountdown()
         finishWithAnimation()
     }
 }

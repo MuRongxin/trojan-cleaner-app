@@ -11,4 +11,8 @@
     <color name="danger">#E53935</color>
     <color name="success">#43A047</color>
     <color name="card_video">#FFF0E6</color>
+    <color name="starry_bg">#0A0A1A</color>
+    <color name="pink">#FFB3C1</color>
+    <color name="miku_green">#39C5BB</color>
+    <color name="sky_blue">#87CEEB</color>
 </resources>

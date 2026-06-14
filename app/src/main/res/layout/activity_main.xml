@@ -92,7 +92,7 @@
                         android:layout_marginTop="16dp"
                         android:text="@string/btn_detect_video"
                         android:textSize="15sp"
-                        app:backgroundTint="@color/success"
+                        app:backgroundTint="@color/miku_green"
                         app:cornerRadius="24dp"
                         style="@style/Widget.MaterialComponents.Button" />
 
@@ -103,7 +103,7 @@
                         android:layout_marginTop="12dp"
                         android:layout_gravity="center_horizontal"
                         android:visibility="gone"
-                        android:indeterminateTint="@color/success" />
+                        android:indeterminateTint="@color/miku_green" />
 
                     <!-- 无应用提示 -->
                     <TextView

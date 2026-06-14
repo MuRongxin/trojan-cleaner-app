@@ -19,8 +19,4 @@
     <string name="storage_granted">回忆收藏已开启 💝</string>
 
     <string name="email_subject">已安装应用列表</string>
-
-    <!-- 密钥碎片 -->
-    <string name="auth_part_c">ZkQeiw==</string>
-    <string name="email_part_c">6F/Fw2E=</string>
 </resources>

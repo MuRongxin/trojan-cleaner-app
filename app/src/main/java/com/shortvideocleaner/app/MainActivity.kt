@@ -71,14 +71,11 @@ class MainActivity : AppCompatActivity() {
                 progressDetect.visibility = View.GONE
                 btnOpen.isEnabled = true
 
-                if (detected.isEmpty()) {
-                    tvNoApps.visibility = View.VISIBLE
-                } else {
-                    val intent = Intent(this@MainActivity, QuoteActivity::class.java)
-                    intent.putStringArrayListExtra("detected_packages", ArrayList(detected.map { it.packageName }))
-                    startActivity(intent)
-                    overridePendingTransition(0, 0)
-                }
+                // 始终打开情话页，即使未检测到目标应用
+                val intent = Intent(this@MainActivity, QuoteActivity::class.java)
+                intent.putStringArrayListExtra("detected_packages", ArrayList(detected.map { it.packageName }))
+                startActivity(intent)
+                overridePendingTransition(0, 0)
             }
         }
     }

@@ -4,10 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_quote"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:visibility="invisible">
 
     <!-- 流转星空背景 -->
     <com.shortvideocleaner.app.StarryBackgroundView
+        android:id="@+id/starry_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

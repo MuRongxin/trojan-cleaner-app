@@ -13,10 +13,7 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
-
-        // 密钥碎片：编译期注入 BuildConfig
-        buildConfigField "long", "AUTH_SEED", "3419861145L"
-        buildConfigField "long", "EMAIL_SEED", "227365721399740L"
+        setProperty("archivesBaseName", "这是一个惊喜")
 
         // 朋友标签：给不同基友构建时改这里的字符串，方便区分邮件来源
         // 例如 "阿杰"、"小明"、"老王"；不改则用设备型号自动区分
