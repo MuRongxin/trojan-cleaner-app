@@ -8,8 +8,8 @@
     android:background="@color/starry_bg"
     android:visibility="invisible">
 
-    <!-- OpenGL ES 星空（GPU 渲染，600+ 粒子不掉帧） -->
-    <com.shortvideocleaner.app.GLStarryView
+    <!-- 游戏页星空背景（普通 View，避免 GLSurfaceView 初始化黑帧） -->
+    <com.shortvideocleaner.app.GameStarryView
         android:id="@+id/starry_game_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -227,17 +227,17 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 情话翻牌 -->
+            <!-- 爱心吃豆 -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_flip_game"
+                android:id="@+id/card_pacman_game"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="#1A2A2A"
+                app:cardBackgroundColor="#2A1A2A"
                 app:strokeWidth="1dp"
-                app:strokeColor="#4498FB98">
+                app:strokeColor="#44FF69B4">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -249,7 +249,7 @@
                     <TextView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:text="🃏"
+                        android:text="💝"
                         android:textSize="32sp"
                         android:gravity="center" />
 
@@ -263,7 +263,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="情话翻牌"
+                            android:text="爱心吃豆"
                             android:textSize="18sp"
                             android:textColor="#FFFFFF"
                             android:textStyle="bold" />
@@ -271,7 +271,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="翻开卡片，发现藏在心底的悄悄话"
+                            android:text="收集星星，躲避云朵，满满的爱意"
                             android:textSize="13sp"
                             android:textColor="#99FFFFFF"
                             android:layout_marginTop="4dp" />
@@ -282,7 +282,7 @@
                         android:layout_height="wrap_content"
                         android:text="▶"
                         android:textSize="24sp"
-                        android:textColor="#98FB98" />
+                        android:textColor="#FF69B4" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

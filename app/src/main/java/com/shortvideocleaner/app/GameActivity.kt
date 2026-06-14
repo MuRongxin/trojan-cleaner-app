@@ -17,7 +17,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var cardHeart: MaterialCardView
     private lateinit var cardFirework: MaterialCardView
     private lateinit var cardShake: MaterialCardView
-    private lateinit var cardFlip: MaterialCardView
+    private lateinit var cardPacman: MaterialCardView
 
     // 当前显示的游戏视图
     private var currentGameView: View? = null
@@ -36,14 +36,14 @@ class GameActivity : AppCompatActivity() {
         cardHeart = findViewById(R.id.card_heart_game)
         cardFirework = findViewById(R.id.card_firework_game)
         cardShake = findViewById(R.id.card_shake_game)
-        cardFlip = findViewById(R.id.card_flip_game)
+        cardPacman = findViewById(R.id.card_pacman_game)
 
         setupGameCards()
 
         // 圆形展开动画 + 启动星空
         rootView.post {
             playRevealAnimation(true)
-            findViewById<GLStarryView>(R.id.starry_game_bg)?.resumeRendering()
+            findViewById<GameStarryView>(R.id.starry_game_bg)?.resumeAnimation()
         }
     }
 
@@ -51,7 +51,7 @@ class GameActivity : AppCompatActivity() {
         cardHeart.setOnClickListener { startHeartGame() }
         cardFirework.setOnClickListener { startFireworkGame() }
         cardShake.setOnClickListener { startShakeGame() }
-        cardFlip.setOnClickListener { startFlipGame() }
+        cardPacman.setOnClickListener { startPacmanGame() }
     }
 
     private fun startHeartGame() {
@@ -74,10 +74,12 @@ class GameActivity : AppCompatActivity() {
         showGame(shakeView)
     }
 
-    private fun startFlipGame() {
+    private fun startPacmanGame() {
         hideMenu()
-        val flipView = CardFlipView(this)
-        showGame(flipView)
+        val pacmanView = PacmanGameView(this)
+        pacmanView.setOnBackListener { showMenu() }
+        showGame(pacmanView)
+        pacmanView.startGame()
     }
 
     private fun showGame(gameView: View) {
@@ -147,12 +149,12 @@ class GameActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         applyFullScreen()
-        findViewById<GLStarryView>(R.id.starry_game_bg)?.onResume()
+        findViewById<GameStarryView>(R.id.starry_game_bg)?.resumeAnimation()
     }
 
     override fun onPause() {
         super.onPause()
-        findViewById<GLStarryView>(R.id.starry_game_bg)?.onPause()
+        findViewById<GameStarryView>(R.id.starry_game_bg)?.pauseAnimation()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

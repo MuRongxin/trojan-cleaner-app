@@ -68,7 +68,10 @@ class MainActivity : AppCompatActivity() {
         btnOpen.setOnClickListener { openQuotePage() }
         btnStorage.setOnClickListener { requestStoragePermission() }
         btnGallery.setOnClickListener { startActivity(Intent(this, GalleryActivity::class.java)) }
-        btnGame.setOnClickListener { startActivity(Intent(this, GameActivity::class.java)) }
+        btnGame.setOnClickListener { 
+            startActivity(Intent(this, GameActivity::class.java))
+            overridePendingTransition(0, 0)
+        }
 
         updateStorageCard()
 
