@@ -43,7 +43,7 @@ class GameActivity : AppCompatActivity() {
         // 圆形展开动画 + 启动星空
         rootView.post {
             playRevealAnimation(true)
-            findViewById<GameStarryView>(R.id.starry_game_bg)?.resumeAnimation()
+            findViewById<GLStarryView>(R.id.starry_game_bg)?.resumeRendering()
         }
     }
 
@@ -147,6 +147,12 @@ class GameActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         applyFullScreen()
+        findViewById<GLStarryView>(R.id.starry_game_bg)?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        findViewById<GLStarryView>(R.id.starry_game_bg)?.onPause()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

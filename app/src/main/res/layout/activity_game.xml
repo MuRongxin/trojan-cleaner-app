@@ -8,8 +8,8 @@
     android:background="@color/starry_bg"
     android:visibility="invisible">
 
-    <!-- 游戏专属动态星空（彩色星云+极光+流光粒子） -->
-    <com.shortvideocleaner.app.GameStarryView
+    <!-- OpenGL ES 星空（GPU 渲染，600+ 粒子不掉帧） -->
+    <com.shortvideocleaner.app.GLStarryView
         android:id="@+id/starry_game_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
