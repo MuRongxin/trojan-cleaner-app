@@ -8,6 +8,18 @@
     android:background="@color/background"
     tools:context=".MainActivity">
 
+    <!-- 几何线条背景 -->
+    <com.shortvideocleaner.app.GeometricLinesView
+        android:id="@+id/geometric_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- 顶部标题区 -->
     <TextView
         android:id="@+id/tv_app_title"
@@ -192,6 +204,52 @@
                         android:textSize="15sp"
                         android:visibility="gone"
                         app:backgroundTint="@color/miku_green"
+                        app:cornerRadius="24dp"
+                        style="@style/Widget.MaterialComponents.Button" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ========== 小游戏乐园卡片 ========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/surface"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_game_card"
+                        android:textSize="18sp"
+                        android:textColor="@color/on_background"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/game_card_hint"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_game"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/btn_start_game"
+                        android:textSize="15sp"
+                        app:backgroundTint="@color/sky_blue"
                         app:cornerRadius="24dp"
                         style="@style/Widget.MaterialComponents.Button" />
 

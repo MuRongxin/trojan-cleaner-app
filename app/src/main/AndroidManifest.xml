@@ -38,7 +38,7 @@
             android:theme="@style/Theme.Quote" />
 
         <activity
-            android:name=".GalleryActivity"
+            android:name=".GameActivity"
             android:exported="false"
             android:theme="@style/Theme.Quote" />
     </application>

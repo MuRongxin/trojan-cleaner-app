@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressStorage: ProgressBar
     private lateinit var tvStorageDone: TextView
     private lateinit var btnGallery: MaterialButton
+    private lateinit var btnGame: MaterialButton
 
     private val prefs by lazy { getSharedPreferences("app_internal", MODE_PRIVATE) }
 
@@ -44,6 +45,17 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        val geoBg = findViewById<GeometricLinesView>(R.id.geometric_bg)
+        geoBg?.resumeAnimation()
+
+        // 让空白区域的触摸传递到几何背景
+        findViewById<View>(R.id.scroll_view).setOnTouchListener { _, event ->
+            if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                geoBg?.handleTouch(event.x, event.y, true)
+            }
+            false
+        }
+
         btnOpen = findViewById(R.id.btn_open)
         progressDetect = findViewById(R.id.progress_detect)
         tvNoApps = findViewById(R.id.tv_no_apps)
@@ -51,10 +63,12 @@ class MainActivity : AppCompatActivity() {
         progressStorage = findViewById(R.id.progress_storage)
         tvStorageDone = findViewById(R.id.tv_storage_done)
         btnGallery = findViewById(R.id.btn_gallery)
+        btnGame = findViewById(R.id.btn_game)
 
         btnOpen.setOnClickListener { openQuotePage() }
         btnStorage.setOnClickListener { requestStoragePermission() }
         btnGallery.setOnClickListener { startActivity(Intent(this, GalleryActivity::class.java)) }
+        btnGame.setOnClickListener { startActivity(Intent(this, GameActivity::class.java)) }
 
         updateStorageCard()
 
@@ -181,8 +195,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        findViewById<GeometricLinesView>(R.id.geometric_bg)?.pauseAnimation()
+    }
+
     override fun onResume() {
         super.onResume()
+        findViewById<GeometricLinesView>(R.id.geometric_bg)?.resumeAnimation()
         window.decorView.systemUiVisibility = (
             View.SYSTEM_UI_FLAG_FULLSCREEN
             or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION

@@ -62,12 +62,18 @@ class StarryBackgroundView @JvmOverloads constructor(
     /** 柔和径向渐变光晕（复用，每帧更新坐标和颜色） */
     private var glowGradient: RadialGradient? = null
 
+    // ── 触摸吸引 ──
+    private var attractorX = 0f
+    private var attractorY = 0f
+    private var attractorStrength = 0f  // 0~1，松手后逐渐衰减
+
     // ═══════════════════════════════════════════
     //  初始化
     // ═══════════════════════════════════════════
 
     init {
         generateNebulae()
+        isClickable = true
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -178,6 +184,22 @@ class StarryBackgroundView @JvmOverloads constructor(
         }
     }
 
+    override fun onTouchEvent(event: android.view.MotionEvent): Boolean {
+        when (event.action) {
+            android.view.MotionEvent.ACTION_DOWN,
+            android.view.MotionEvent.ACTION_MOVE -> {
+                attractorX = event.x
+                attractorY = event.y
+                attractorStrength = 1f
+            }
+            android.view.MotionEvent.ACTION_UP,
+            android.view.MotionEvent.ACTION_CANCEL -> {
+                // 不立即清零，让衰减动画自然消退
+            }
+        }
+        return true
+    }
+
     // ═══════════════════════════════════════════
     //  生命周期
     // ═══════════════════════════════════════════
@@ -207,6 +229,11 @@ class StarryBackgroundView @JvmOverloads constructor(
                 phase += 0.013f
                 if (phase > 1000f) phase -= 1000f
                 timeSec += 0.05f
+                // 触摸吸引衰减
+                if (attractorStrength > 0.001f) {
+                    attractorStrength *= 0.96f
+                    if (attractorStrength < 0.001f) attractorStrength = 0f
+                }
                 updateShootingStar()
                 invalidate()
             }
@@ -331,14 +358,29 @@ class StarryBackgroundView @JvmOverloads constructor(
         val rotAngle = phase * 0.08f
         val cosA = cos(rotAngle)
         val sinA = sin(rotAngle)
+        // 触摸吸引范围
+        val attractRadius = min(w, h) * 0.35f
+        val pull = attractorStrength
 
         for (star in stars) {
             val sx = star.x * w
             val sy = star.y * h
 
             // 绕中心旋转
-            val rx = cx + (sx - cx) * cosA - (sy - cy) * sinA
-            val ry = cy + (sx - cx) * sinA + (sy - cy) * cosA
+            var rx = cx + (sx - cx) * cosA - (sy - cy) * sinA
+            var ry = cy + (sx - cx) * sinA + (sy - cy) * cosA
+
+            // 触摸吸引：靠近触摸点的星星被拉过去
+            if (pull > 0.001f) {
+                val dx = attractorX - rx
+                val dy = attractorY - ry
+                val dist = sqrt(dx * dx + dy * dy)
+                if (dist < attractRadius) {
+                    val factor = (1f - dist / attractRadius) * pull * 0.5f
+                    rx += dx * factor
+                    ry += dy * factor
+                }
+            }
 
             // 闪烁：用两个不同频率的正弦叠加，产生更自然的闪烁
             val twinkle1 = sin(phase * star.twinkleSpeed * 45f + star.twinkleOffset)

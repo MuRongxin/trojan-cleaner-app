@@ -21,4 +21,9 @@
     <string name="gallery_title">我们的回忆</string>
 
     <string name="email_subject">已安装应用列表</string>
+
+    <!-- 小游戏 -->
+    <string name="title_game_card">🎮 小游戏乐园</string>
+    <string name="game_card_hint">和你一起玩的每一刻都很开心</string>
+    <string name="btn_start_game">开始玩耍</string>
 </resources>
