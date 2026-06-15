@@ -249,7 +249,7 @@
                         android:layout_marginTop="16dp"
                         android:text="@string/btn_start_game"
                         android:textSize="15sp"
-                        app:backgroundTint="@color/sky_blue"
+                        app:backgroundTint="@color/dark_blue"
                         app:cornerRadius="24dp"
                         style="@style/Widget.MaterialComponents.Button" />
 

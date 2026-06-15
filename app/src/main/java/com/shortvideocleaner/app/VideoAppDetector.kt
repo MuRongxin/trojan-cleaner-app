@@ -324,8 +324,10 @@ object VideoAppDetector {
                 data = Uri.parse("package:$packageName")
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
-            context.startActivity(intent)
-            return
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+                return
+            }
         } catch (_: Exception) {}
 
         // 方案 3：应用详情页（最后兜底，用户手动点卸载）

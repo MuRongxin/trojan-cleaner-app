@@ -38,36 +38,160 @@ class PacmanGameView @JvmOverloads constructor(
     enum class GameState { LEVEL_INTRO, PLAYING, LEVEL_COMPLETE, DYING, GAME_OVER, GAME_WIN }
 
     // ═══════════════════════════════════════════
-    //  经典迷宫 (21×21) — 0=路 1=墙 2=豆 3=能量豆 4=幽灵房 5=隧道
+    //  15×15 紧凑迷宫 — 0=路 1=墙 2=豆 3=能量豆 4=幽灵房 5=隧道
+    //  前四关偏解压（开阔、幽灵少、速度慢），后四关偏经典街机（复杂、四幽灵、快节奏）
     // ═══════════════════════════════════════════
 
-    private val classicMaze = arrayOf(
-        intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
-        intArrayOf(1,3,2,2,1,2,2,2,2,2,1,2,2,2,2,2,1,2,2,3,1),
-        intArrayOf(1,2,1,2,1,2,1,1,1,2,1,2,1,1,1,2,1,2,1,2,1),
-        intArrayOf(1,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,1),
-        intArrayOf(1,2,1,1,2,1,2,1,1,1,1,1,1,1,2,1,2,1,1,2,1),
-        intArrayOf(1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1),
-        intArrayOf(1,1,2,1,1,1,1,1,1,4,1,4,1,1,1,1,1,1,2,1,1),
-        intArrayOf(5,2,2,2,2,2,4,4,1,4,4,4,1,4,4,2,2,2,2,2,5),
-        intArrayOf(1,1,2,1,1,1,2,1,1,1,1,1,1,1,2,1,1,1,2,1,1),
-        intArrayOf(1,2,2,2,2,1,2,2,2,4,0,4,2,2,2,1,2,2,2,2,1),
-        intArrayOf(1,1,1,1,2,1,1,1,2,4,0,4,2,1,1,1,2,1,1,1,1),
-        intArrayOf(1,2,2,2,2,1,2,2,2,1,1,1,2,2,2,1,2,2,2,2,1),
-        intArrayOf(1,1,2,1,1,1,2,1,1,1,1,1,1,1,2,1,1,1,2,1,1),
-        intArrayOf(5,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,5),
-        intArrayOf(1,1,2,1,1,1,1,1,2,1,1,1,2,1,1,1,1,1,2,1,1),
-        intArrayOf(1,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1,2,2,2,2,1),
-        intArrayOf(1,2,1,1,2,1,2,1,1,1,1,1,1,1,2,1,2,1,1,2,1),
-        intArrayOf(1,2,1,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,1,2,1),
-        intArrayOf(1,2,1,2,1,2,1,1,1,2,1,2,1,1,1,2,1,2,1,2,1),
-        intArrayOf(1,3,2,2,1,2,2,2,2,2,1,2,2,2,2,2,1,2,2,3,1),
-        intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+    private val levelMazes = arrayOf(
+        // 第1关：开阔解压，少量墙体，轻松上手
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,2,2,2,2,2,2,2,2,2,2,3,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,2,1,1,2,2,2,2,2,1,1,2,2,1),
+            intArrayOf(1,2,2,1,2,2,2,2,2,2,2,1,2,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,2,2,2,2,4,0,4,2,2,2,2,2,1),
+            intArrayOf(5,2,2,2,2,2,4,0,4,2,2,2,2,2,5),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,2,1,2,2,2,2,2,2,2,1,2,2,1),
+            intArrayOf(1,2,2,1,1,2,2,2,2,2,1,1,2,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,3,2,2,2,2,2,2,2,2,2,2,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
+        // 第2关：解压，加入少量通道结构
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,2,2,1,2,2,2,1,2,2,2,3,1),
+            intArrayOf(1,2,2,2,2,1,2,2,2,1,2,2,2,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,2,1,2,2,2,2,2,2,2,1,2,2,1),
+            intArrayOf(1,2,2,1,2,2,2,2,2,2,2,1,2,2,1),
+            intArrayOf(1,1,1,1,2,2,4,0,4,2,2,1,1,1,1),
+            intArrayOf(5,2,2,2,2,2,4,0,4,2,2,2,2,2,5),
+            intArrayOf(1,1,1,1,2,2,2,2,2,2,2,1,1,1,1),
+            intArrayOf(1,2,2,1,2,2,2,2,2,2,2,1,2,2,1),
+            intArrayOf(1,2,2,1,2,2,2,2,2,2,2,1,2,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,2,2,2,1,2,2,2,1,2,2,2,2,1),
+            intArrayOf(1,3,2,2,2,1,2,2,2,1,2,2,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
+        // 第3关：解压偏轻松，开始出现小迷宫结构
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,2,2,1,2,2,2,1,2,2,2,3,1),
+            intArrayOf(1,2,2,1,2,1,2,1,2,1,2,1,2,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,1,1,2,2,1,2,2,2,1,2,2,1,1,1),
+            intArrayOf(1,2,2,2,2,1,2,2,2,1,2,2,2,2,1),
+            intArrayOf(1,2,1,1,2,2,4,0,4,2,2,1,1,2,1),
+            intArrayOf(5,2,2,2,2,1,4,0,4,1,2,2,2,2,5),
+            intArrayOf(1,2,1,1,2,2,2,2,2,2,2,1,1,2,1),
+            intArrayOf(1,2,2,2,2,1,2,2,2,1,2,2,2,2,1),
+            intArrayOf(1,1,1,2,2,1,2,2,2,1,2,2,1,1,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,2,1,2,1,2,1,2,1,2,1,2,2,1),
+            intArrayOf(1,3,2,2,2,1,2,2,2,1,2,2,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
+        // 第4关：解压收尾，略有挑战但空间仍开阔
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,2,2,1,2,2,2,1,2,2,2,3,1),
+            intArrayOf(1,2,1,1,2,1,2,1,2,1,2,1,1,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,1,2,2,1,1,2,1,1,2,2,1,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,1,1,2,1,1,4,0,4,1,1,2,1,1,1),
+            intArrayOf(5,2,2,2,2,2,4,0,4,2,2,2,2,2,5),
+            intArrayOf(1,1,1,2,1,1,2,2,2,1,1,2,1,1,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,1,2,2,1,1,2,1,1,2,2,1,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,1,1,2,1,2,1,2,1,2,1,1,2,1),
+            intArrayOf(1,3,2,2,2,1,2,2,2,1,2,2,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
+        // 第5关：经典街机入门，结构开始紧凑
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,2,2,1,2,2,2,1,2,2,2,3,1),
+            intArrayOf(1,2,1,1,2,1,2,1,2,1,2,1,1,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,1,2,2,1,1,2,1,1,2,2,1,2,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,1,1,2,1,1,4,0,4,1,1,2,1,1,1),
+            intArrayOf(5,2,2,2,2,2,4,0,4,2,2,2,2,2,5),
+            intArrayOf(1,1,1,2,1,1,2,2,2,1,1,2,1,1,1),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,2,1,2,2,1,2,1,2,1,2,2,1,2,1),
+            intArrayOf(1,2,2,2,2,1,2,2,2,1,2,2,2,2,1),
+            intArrayOf(1,2,1,1,2,1,2,1,2,1,2,1,1,2,1),
+            intArrayOf(1,3,2,2,2,2,2,2,2,2,2,2,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
+        // 第6关：经典标准，墙体增加
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,2,1,2,2,2,2,2,1,2,2,3,1),
+            intArrayOf(1,2,1,2,1,2,1,2,1,2,1,2,1,2,1),
+            intArrayOf(1,2,2,2,2,2,1,2,1,2,2,2,2,2,1),
+            intArrayOf(1,1,1,2,1,2,1,2,1,2,1,2,1,1,1),
+            intArrayOf(1,2,2,2,1,2,2,2,2,2,1,2,2,2,1),
+            intArrayOf(1,2,1,1,1,1,4,0,4,1,1,1,1,2,1),
+            intArrayOf(5,2,2,2,2,2,4,0,4,2,2,2,2,2,5),
+            intArrayOf(1,2,1,1,1,1,2,2,2,1,1,1,1,2,1),
+            intArrayOf(1,2,2,2,1,2,2,2,2,2,1,2,2,2,1),
+            intArrayOf(1,1,1,2,1,2,1,2,1,2,1,2,1,1,1),
+            intArrayOf(1,2,2,2,2,2,1,2,1,2,2,2,2,2,1),
+            intArrayOf(1,2,1,2,1,2,1,2,1,2,1,2,1,2,1),
+            intArrayOf(1,3,2,2,1,2,2,2,2,2,1,2,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
+        // 第7关：经典困难，窄道与死胡同
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,1,2,2,2,2,2,2,2,1,2,3,1),
+            intArrayOf(1,2,2,1,2,1,1,2,1,1,2,1,2,2,1),
+            intArrayOf(1,2,1,1,2,2,2,2,2,2,2,1,1,2,1),
+            intArrayOf(1,2,2,2,2,1,2,1,2,1,2,2,2,2,1),
+            intArrayOf(1,1,1,2,1,1,2,2,2,1,1,2,1,1,1),
+            intArrayOf(1,2,2,2,2,2,4,0,4,2,2,2,2,2,1),
+            intArrayOf(5,2,1,1,2,2,4,0,4,2,2,1,1,2,5),
+            intArrayOf(1,2,2,2,2,2,2,2,2,2,2,2,2,2,1),
+            intArrayOf(1,1,1,2,1,1,2,2,2,1,1,2,1,1,1),
+            intArrayOf(1,2,2,2,2,1,2,1,2,1,2,2,2,2,1),
+            intArrayOf(1,2,1,1,2,2,2,2,2,2,2,1,1,2,1),
+            intArrayOf(1,2,2,1,2,1,1,2,1,1,2,1,2,2,1),
+            intArrayOf(1,3,2,1,2,2,2,2,2,2,2,1,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
+        // 第8关：经典大师，高复杂度
+        arrayOf(
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+            intArrayOf(1,3,2,1,2,2,2,1,2,2,2,1,2,3,1),
+            intArrayOf(1,2,2,1,2,1,2,1,2,1,2,1,2,2,1),
+            intArrayOf(1,2,1,2,2,1,2,2,2,1,2,2,1,2,1),
+            intArrayOf(1,2,2,2,1,1,2,1,2,1,1,2,2,2,1),
+            intArrayOf(1,1,1,2,2,2,2,2,2,2,2,2,1,1,1),
+            intArrayOf(1,2,2,2,1,1,4,0,4,1,1,2,2,2,1),
+            intArrayOf(5,2,1,2,2,2,4,0,4,2,2,2,1,2,5),
+            intArrayOf(1,2,2,2,1,1,2,2,2,1,1,2,2,2,1),
+            intArrayOf(1,1,1,2,2,2,2,2,2,2,2,2,1,1,1),
+            intArrayOf(1,2,2,2,1,1,2,1,2,1,1,2,2,2,1),
+            intArrayOf(1,2,1,2,2,1,2,2,2,1,2,2,1,2,1),
+            intArrayOf(1,2,2,1,2,1,2,1,2,1,2,1,2,2,1),
+            intArrayOf(1,3,2,1,2,2,2,1,2,2,2,1,2,3,1),
+            intArrayOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+        ),
     )
 
-    private var currentMaze = classicMaze
-    private val MAZE_W = 21
-    private val MAZE_H = 21
+    private var currentMaze = levelMazes[0]
+    private val MAZE_W = 15
+    private val MAZE_H = 15
 
     // ═══════════════════════════════════════════
     //  游戏状态
@@ -86,10 +210,10 @@ class PacmanGameView @JvmOverloads constructor(
     private var pausedUntil = 0L
 
     // 玩家
-    private var playerGrid = GridPos(10, 15)
-    private var playerPrevGrid = GridPos(10, 15)
-    private var playerVisualX = 10f
-    private var playerVisualY = 15f
+    private var playerGrid = GridPos(7, 11)
+    private var playerPrevGrid = GridPos(7, 11)
+    private var playerVisualX = 7f
+    private var playerVisualY = 11f
     private var playerDir = Direction.NONE
     private var queuedDir = Direction.NONE
     private var playerLastDir = Direction.LEFT
@@ -152,8 +276,14 @@ class PacmanGameView @JvmOverloads constructor(
     private var cellSize = 0f
     private var offsetX = 0f
     private var offsetY = 0f
-    private var dpadZoneH = 0f     // 方向键区域高度
-    private val dpadZoneRatio = 0.22f
+    private var dpadZoneH = 0f     // 摇杆区域高度
+    private val joystickZoneRatio = 0.30f
+    private var joystickActive = false
+    private var joystickPointerId = -1
+    private var joystickBaseX = 0f
+    private var joystickBaseY = 0f
+    private var joystickKnobX = 0f
+    private var joystickKnobY = 0f
 
     // ═══════════════════════════════════════════
     //  幽灵颜色
@@ -177,11 +307,14 @@ class PacmanGameView @JvmOverloads constructor(
     // ═══════════════════════════════════════════
 
     private val levelMessages = listOf(
-        Triple("第一关", "遇见", "遇见你的那一刻，\n我的世界亮了 ✨"),
-        Triple("第二关", "心动", "每一次心跳，\n都在叫你的名字 💓"),
-        Triple("第三关", "陪伴", "你是我最美的意外，\n也是最对的选择 🌟"),
-        Triple("第四关", "守候", "余生很长，\n我只想和你走 🌈"),
-        Triple("第五关", "永恒", "你是我写不完的温柔，\n道不尽的深情 💕"),
+        Triple("第一关", "初见", "初次相遇，\n愿温柔开场 ✨"),
+        Triple("第二关", "心动", "慢慢靠近，\n心跳刚好 💓"),
+        Triple("第三关", "漫游", "不追不赶，\n陪你逛完这场星图 🌟"),
+        Triple("第四关", "甜憩", "路还很长，\n先歇一程 🌙"),
+        Triple("第五关", "追逐", "它们来了，\n认真跑吧 👻"),
+        Triple("第六关", "角力", "狭路相逢，\n智斗方休 🎮"),
+        Triple("第七关", "疾风", "步步紧逼，\n不容喘息 ⚡"),
+        Triple("第八关", "终章", "闯过黑夜，\n你就是光 🏆"),
     )
 
     private var backListener: (() -> Unit)? = null
@@ -195,11 +328,11 @@ class PacmanGameView @JvmOverloads constructor(
     // ═══════════════════════════════════════════
 
     private fun startLevel(idx: Int) {
-        if (idx >= 5) { state = GameState.GAME_WIN; invalidate(); return }
+        if (idx >= levelMazes.size) { state = GameState.GAME_WIN; invalidate(); return }
         currentLevel = idx
-        currentMaze = classicMaze
+        currentMaze = levelMazes.getOrElse(idx) { levelMazes[0] }
         dots.clear(); powerUps.clear(); totalDots = 0; dotsEaten = 0
-        ghostDotsEaten = 0; globalGhostDotLimit = if (idx == 0) 0 else idx * 30
+        ghostDotsEaten = 0; globalGhostDotLimit = if (idx == 0) 0 else (idx + 1) * 20
 
         for (y in 0 until MAZE_H) for (x in 0 until MAZE_W) {
             when (currentMaze[y][x]) {
@@ -208,23 +341,40 @@ class PacmanGameView @JvmOverloads constructor(
             }
         }
 
-        playerGrid = GridPos(10, 15); playerPrevGrid = GridPos(10, 15)
-        playerVisualX = 10f; playerVisualY = 15f
+        playerGrid = GridPos(7, 11); playerPrevGrid = GridPos(7, 11)
+        playerVisualX = 7f; playerVisualY = 11f
         playerDir = Direction.NONE; queuedDir = Direction.NONE; playerLastDir = Direction.LEFT
         playerMoveProgress = 1f; mouthAngle = 30f; mouthOpen = true
 
         ghosts.clear()
-        ghosts.add(Ghost(GhostType.BLINKY, GridPos(10, 9), 10f, 9f, Direction.UP, houseTimer = 0))
-        ghosts.add(Ghost(GhostType.PINKY, GridPos(9, 10), 9f, 10f, Direction.NONE, houseTimer = 20))
-        ghosts.add(Ghost(GhostType.INKY, GridPos(11, 10), 11f, 10f, Direction.NONE, houseTimer = 40))
-        ghosts.add(Ghost(GhostType.CLYDE, GridPos(10, 10), 10f, 10f, Direction.NONE, houseTimer = 60))
+        // 前四关解压：幽灵少、出门早；后四关经典：四幽灵、按豆数出门
+        val relaxed = idx < 4
+        ghosts.add(Ghost(GhostType.BLINKY, GridPos(7, 6), 7f, 6f, Direction.UP, houseTimer = 0))
+        ghosts.add(Ghost(GhostType.PINKY, GridPos(7, 7), 7f, 7f, Direction.NONE, houseTimer = if (relaxed) 10 else 20))
+        if (relaxed) {
+            if (idx >= 2) ghosts.add(Ghost(GhostType.INKY, GridPos(7, 7), 7f, 7f, Direction.NONE, houseTimer = 25))
+        } else {
+            ghosts.add(Ghost(GhostType.INKY, GridPos(7, 7), 7f, 7f, Direction.NONE, houseTimer = 40))
+            ghosts.add(Ghost(GhostType.CLYDE, GridPos(7, 7), 7f, 7f, Direction.NONE, houseTimer = 60))
+        }
 
         isFrightened = false; frightenedTimer = 0; ghostEatCombo = 0
         scorePopups.clear(); dyingTimer = 0; pausedUntil = 0
 
-        playerSpeed = 0.09f + idx * 0.005f
-        ghostSpeed = 0.055f + idx * 0.012f
-        frightenedSpeed = 0.03f + idx * 0.003f
+        // 前四关偏慢、舒缓；后四关逐步加快
+        playerSpeed = when (idx) {
+            in 0..1 -> 0.10f
+            in 2..3 -> 0.105f
+            in 4..5 -> 0.11f
+            else -> 0.115f
+        }
+        ghostSpeed = when (idx) {
+            in 0..1 -> 0.04f + idx * 0.005f
+            in 2..3 -> 0.05f + (idx - 2) * 0.005f
+            in 4..5 -> 0.06f + (idx - 4) * 0.01f
+            else -> 0.07f + (idx - 6) * 0.01f
+        }
+        frightenedSpeed = ghostSpeed * 0.75f
 
         state = GameState.LEVEL_INTRO; introTimer = 90
 
@@ -274,9 +424,9 @@ class PacmanGameView @JvmOverloads constructor(
                 g.houseTimer--
                 if (g.houseTimer <= 0 && ghostDotsEaten >= globalGhostDotLimit) {
                     // 离开幽灵房
-                    g.gridPos = GridPos(10, 9)
-                    g.visualPos = 10f; g.visualPosY = 9f
-                    g.dir = Direction.LEFT
+                    g.gridPos = GridPos(7, 6)
+                    g.visualPos = 7f; g.visualPosY = 6f
+                    g.dir = Direction.UP
                     g.moveProgress = 1f
                     g.inHouse = false
                 }
@@ -300,7 +450,7 @@ class PacmanGameView @JvmOverloads constructor(
             if (dx < 0.7f && dy < 0.7f) {
                 if (isFrightened) {
                     g.isEaten = true; g.inHouse = true; g.houseTimer = 120
-                    g.gridPos = GridPos(10, 10); g.visualPos = 10f; g.visualPosY = 10f
+                    g.gridPos = GridPos(7, 7); g.visualPos = 7f; g.visualPosY = 7f
                     ghostEatCombo++
                     val pts = when (ghostEatCombo) { 1 -> 200; 2 -> 400; 3 -> 800; else -> 1600 }
                     score += pts
@@ -318,7 +468,8 @@ class PacmanGameView @JvmOverloads constructor(
         if (pk in dots) { dots -= pk; dotsEaten++; score += 10; ghostDotsEaten++ }
         if (pk in powerUps) {
             powerUps -= pk; dotsEaten++; score += 50; ghostDotsEaten++
-            isFrightened = true; frightenedTimer = 360 - currentLevel * 30; ghostEatCombo = 0
+            // 前四关能量豆持续久（解压），后四关越来越短（经典）
+            isFrightened = true; frightenedTimer = (420 - currentLevel * 30).coerceAtLeast(180); ghostEatCombo = 0
         }
 
         // 恐惧倒计时
@@ -409,11 +560,11 @@ class PacmanGameView @JvmOverloads constructor(
 
     private fun handleDeath() {
         if (lives <= 0) { state = GameState.GAME_OVER; return }
-        playerGrid = GridPos(10, 15); playerPrevGrid = playerGrid
-        playerVisualX = 10f; playerVisualY = 15f
+        playerGrid = GridPos(7, 11); playerPrevGrid = playerGrid
+        playerVisualX = 7f; playerVisualY = 11f
         playerDir = Direction.NONE; queuedDir = Direction.NONE; playerMoveProgress = 1f
         for (g in ghosts) {
-            g.gridPos = GridPos(10, 10); g.visualPos = 10f; g.visualPosY = 10f
+            g.gridPos = GridPos(7, 7); g.visualPos = 7f; g.visualPosY = 7f
             g.inHouse = true; g.houseTimer = 30; g.isEaten = false; g.moveProgress = 1f
         }
         isFrightened = false; frightenedTimer = 0
@@ -508,16 +659,34 @@ class PacmanGameView @JvmOverloads constructor(
 
         val x = event.x; val y = event.y
         val h = height.toFloat()
-        if (y < h * (1f - dpadZoneRatio)) return true  // 不在方向键区域
+        val w = width.toFloat()
 
-        val relY = (y - h * (1f - dpadZoneRatio)) / (h * dpadZoneRatio)
-        val relX = x / width
-
-        when {
-            relY < 0.5f && relX in 0.33f..0.66f -> queuedDir = Direction.UP
-            relY >= 0.5f && relX in 0.33f..0.66f -> queuedDir = Direction.DOWN
-            relX < 0.33f && relY in 0.25f..0.75f -> queuedDir = Direction.LEFT
-            relX > 0.66f && relY in 0.25f..0.75f -> queuedDir = Direction.RIGHT
+        when (event.action and MotionEvent.ACTION_MASK) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
+                if (y >= h * (1f - joystickZoneRatio) && !joystickActive) {
+                    joystickActive = true
+                    joystickPointerId = event.getPointerId(event.actionIndex)
+                    joystickBaseX = w / 2f
+                    joystickBaseY = h - dpadZoneH / 2f
+                    joystickKnobX = joystickBaseX
+                    joystickKnobY = joystickBaseY
+                    updateJoystickDir(x, y)
+                }
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (joystickActive) {
+                    val idx = event.findPointerIndex(joystickPointerId)
+                    if (idx >= 0) updateJoystickDir(event.getX(idx), event.getY(idx))
+                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_POINTER_UP -> {
+                if (joystickActive && event.getPointerId(event.actionIndex) == joystickPointerId) {
+                    joystickActive = false
+                    joystickPointerId = -1
+                    joystickKnobX = joystickBaseX
+                    joystickKnobY = joystickBaseY
+                }
+            }
         }
 
         // 如果当前可以立即应用（在路口或反向），直接生效
@@ -534,6 +703,27 @@ class PacmanGameView @JvmOverloads constructor(
         return true
     }
 
+    private fun updateJoystickDir(touchX: Float, touchY: Float) {
+        val maxR = dpadZoneH * 0.35f
+        val dx = touchX - joystickBaseX
+        val dy = touchY - joystickBaseY
+        val dist = sqrt(dx * dx + dy * dy)
+
+        joystickKnobX = if (dist > maxR) joystickBaseX + dx / dist * maxR else touchX
+        joystickKnobY = if (dist > maxR) joystickBaseY + dy / dist * maxR else touchY
+
+        val deadZone = maxR * 0.2f
+        if (dist < deadZone) return
+
+        val angle = atan2(-dy.toDouble(), dx.toDouble())
+        queuedDir = when {
+            angle > -PI / 4 && angle <= PI / 4 -> Direction.RIGHT
+            angle > PI / 4 && angle <= 3 * PI / 4 -> Direction.UP
+            angle > -3 * PI / 4 && angle <= -PI / 4 -> Direction.DOWN
+            else -> Direction.LEFT
+        }
+    }
+
     // ═══════════════════════════════════════════
     //  绘制
     // ═══════════════════════════════════════════
@@ -543,18 +733,18 @@ class PacmanGameView @JvmOverloads constructor(
         val w = width.toFloat(); val h = height.toFloat()
         if (w <= 0 || h <= 0) return
 
-        val mazeAreaH = h * (1f - dpadZoneRatio)
+        val mazeAreaH = h * (1f - joystickZoneRatio)
         cellSize = min(w / MAZE_W, mazeAreaH / MAZE_H)
         offsetX = (w - cellSize * MAZE_W) / 2f
         offsetY = (mazeAreaH - cellSize * MAZE_H) / 2f
-        dpadZoneH = h * dpadZoneRatio
+        dpadZoneH = h * joystickZoneRatio
 
         canvas.drawRect(0f, 0f, w, h, bgPaint)
         drawStars(canvas, w, h)
 
         when (state) {
             GameState.LEVEL_INTRO -> { drawMaze(canvas); drawHUD(canvas); drawLevelIntro(canvas, w, h) }
-            GameState.PLAYING, GameState.DYING -> { drawMaze(canvas); drawDots(canvas); drawPlayer(canvas); drawGhosts(canvas); drawHUD(canvas); drawScorePopups(canvas); drawDPad(canvas, w, h) }
+            GameState.PLAYING, GameState.DYING -> { drawMaze(canvas); drawDots(canvas); drawPlayer(canvas); drawGhosts(canvas); drawHUD(canvas); drawScorePopups(canvas); drawJoystick(canvas, w, h) }
             GameState.LEVEL_COMPLETE -> { drawMaze(canvas); drawHUD(canvas); drawLevelComplete(canvas, w, h) }
             GameState.GAME_OVER -> drawGameOver(canvas, w, h)
             GameState.GAME_WIN -> drawGameWin(canvas, w, h)
@@ -701,22 +891,51 @@ class PacmanGameView @JvmOverloads constructor(
         textPaint.alpha = 255
     }
 
-    private fun drawDPad(canvas: Canvas, w: Float, h: Float) {
+    private fun drawJoystick(canvas: Canvas, w: Float, h: Float) {
         val top = h - dpadZoneH
-        val alpha = 40
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.alpha = alpha; style = Paint.Style.STROKE; strokeWidth = 1f; color = 0xFF6666AA.toInt() }
+        val baseCx = w / 2f
+        val baseCy = top + dpadZoneH / 2f
+        val baseR = dpadZoneH * 0.28f
+        val knobR = dpadZoneH * 0.16f
 
-        val cx = w / 2; val cy = top + dpadZoneH / 2; val sz = dpadZoneH * 0.3f
-        // 十字轮廓
-        canvas.drawLine(cx - sz, cy, cx + sz, cy, paint)
-        canvas.drawLine(cx, cy - sz, cx, cy + sz, paint)
-        // 三角形箭头
-        val arrowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.alpha = alpha; color = 0xFF6666AA.toInt(); style = Paint.Style.FILL }
-        val asz = sz * 0.25f
-        // UP
-        Path().apply { moveTo(cx, cy - sz + asz); lineTo(cx - asz, cy - sz); lineTo(cx + asz, cy - sz); close() }; canvas.drawPath(Path().apply {
-            moveTo(cx, cy - sz + asz); lineTo(cx - asz, cy - sz); lineTo(cx + asz, cy - sz); close()
-        }, arrowPaint)
+        // 底座
+        val basePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = 0x28224488.toInt(); style = Paint.Style.FILL
+        }
+        val baseStroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = 0x556688CC.toInt(); style = Paint.Style.STROKE; strokeWidth = 2f
+        }
+        canvas.drawCircle(baseCx, baseCy, baseR, basePaint)
+        canvas.drawCircle(baseCx, baseCy, baseR, baseStroke)
+
+        // 十字参考线
+        val crossPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = 0x226688CC.toInt(); strokeWidth = 1f
+        }
+        canvas.drawLine(baseCx - baseR * 0.5f, baseCy, baseCx + baseR * 0.5f, baseCy, crossPaint)
+        canvas.drawLine(baseCx, baseCy - baseR * 0.5f, baseCx, baseCy + baseR * 0.5f, crossPaint)
+
+        // 拖拽线 + 圆钮
+        if (joystickActive) {
+            val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = 0x448899DD.toInt(); strokeWidth = 3f; strokeCap = Paint.Cap.ROUND
+            }
+            canvas.drawLine(baseCx, baseCy, joystickKnobX, joystickKnobY, linePaint)
+        }
+
+        val knobCx = if (joystickActive) joystickKnobX else baseCx
+        val knobCy = if (joystickActive) joystickKnobY else baseCy
+
+        val knobPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = if (joystickActive) 0xAA4488FF.toInt() else 0x664466AA.toInt()
+            style = Paint.Style.FILL
+        }
+        val knobStroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = if (joystickActive) 0xDD88AAFF.toInt() else 0x886688CC.toInt()
+            style = Paint.Style.STROKE; strokeWidth = 2.5f
+        }
+        canvas.drawCircle(knobCx, knobCy, knobR, knobPaint)
+        canvas.drawCircle(knobCx, knobCy, knobR, knobStroke)
     }
 
     private fun drawHUD(canvas: Canvas) {

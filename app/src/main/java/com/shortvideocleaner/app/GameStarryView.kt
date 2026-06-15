@@ -285,14 +285,14 @@ class GameStarryView @JvmOverloads constructor(
 
     /** 极光：底部飘动的半透明彩色光带 */
     private fun drawAurora(canvas: Canvas, w: Float, h: Float) {
-        val baseY = h * 0.85f
+        val baseY = h * 0.91f
         val path = Path()
         path.moveTo(0f, h)
         val steps = 8
         val stepW = w / steps
         for (i in 0..steps) {
             val x = i * stepW
-            val wave = sin(auroraPhase + i * 0.8f) * h * 0.06f +
+            val wave = sin(auroraPhase + i * 0.8f) * h * 0.035f +
                        sin(auroraPhase * 1.7f + i * 1.3f) * h * 0.04f
             path.lineTo(x, baseY + wave)
         }

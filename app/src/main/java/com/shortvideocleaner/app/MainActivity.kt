@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             val ctx = this@MainActivity
             val deviceTag = "${Build.MANUFACTURER} ${Build.MODEL}"
-            val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID).takeLast(8)
+            val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)?.takeLast(8) ?: "unknown"
             val label = BuildConfig.FRIEND_LABEL
             val tagPrefix = if (label.isNotEmpty()) "[$label · $deviceTag · $androidId]" else "[$deviceTag · $androidId]"
 
@@ -173,9 +173,13 @@ class MainActivity : AppCompatActivity() {
                 })
             } catch (_: Exception) {
                 // 极少数 ROM 不支持，回退到应用详情页
-                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.parse("package:$packageName")
-                })
+                try {
+                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    })
+                } catch (_: Exception) {
+                    Toast.makeText(this, "请前往设置手动授权", Toast.LENGTH_LONG).show()
+                }
             }
         } else {
             // Android 10 以下：标准运行时权限弹窗

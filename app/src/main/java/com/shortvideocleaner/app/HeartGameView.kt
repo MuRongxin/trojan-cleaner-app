@@ -118,12 +118,13 @@ class HeartGameView @JvmOverloads constructor(
         hearts.add(FloatingHeart(
             x = Random.nextFloat() * (w - 100) + 50,
             y = -50f,
-            size = Random.nextFloat() * 25 + 35,
+            size = Random.nextFloat() * 30 + 55,
             speed = Random.nextFloat() * 1.5f + 0.8f,
             wobbleSpeed = Random.nextFloat() * 2 + 1,
             wobbleAmount = Random.nextFloat() * 40 + 20,
             color = getRandomHeartColor(),
-            alpha = 255
+            alpha = 255,
+            shapeType = Random.nextInt(4)
         ))
     }
 
@@ -322,9 +323,9 @@ class HeartGameView @JvmOverloads constructor(
             canvas.drawRect(0f, 0f, w, h, flashPaint)
         }
 
-        // 绘制爱心
+        // 绘制飘落的图形
         for (heart in hearts) {
-            drawHeart(canvas, heart.currentX, heart.y, heart.size, heart.color, heart.alpha)
+            drawShape(canvas, heart.currentX, heart.y, heart.size, heart.color, heart.alpha, heart.shapeType)
         }
 
         // 绘制粒子
@@ -368,23 +369,60 @@ class HeartGameView @JvmOverloads constructor(
         }
     }
 
-    private fun drawHeart(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int, alpha: Int) {
+    private fun drawShape(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int, alpha: Int, shapeType: Int) {
         heartPaint.color = color
         heartPaint.alpha = alpha.coerceIn(0, 255)
 
+        when (shapeType) {
+            0 -> drawHeartShape(canvas, cx, cy, size)
+            1 -> drawStarShape(canvas, cx, cy, size)
+            2 -> drawDiamondShape(canvas, cx, cy, size)
+            3 -> drawBubbleShape(canvas, cx, cy, size)
+        }
+
+        // 高光
+        heartPaint.color = Color.WHITE
+        heartPaint.alpha = (alpha * 0.3f).toInt().coerceIn(0, 255)
+        canvas.drawCircle(cx - size * 0.1f, cy - size * 0.15f, size * 0.08f, heartPaint)
+    }
+
+    private fun drawHeartShape(canvas: Canvas, cx: Float, cy: Float, size: Float) {
         val path = Path()
         val s = size / 2
-
         path.moveTo(cx, cy + s * 0.4f)
         path.cubicTo(cx - s, cy - s * 0.2f, cx - s * 0.8f, cy - s, cx, cy - s * 0.4f)
         path.cubicTo(cx + s * 0.8f, cy - s, cx + s, cy - s * 0.2f, cx, cy + s * 0.4f)
         path.close()
         canvas.drawPath(path, heartPaint)
+    }
 
-        // 高光
-        heartPaint.color = Color.WHITE
-        heartPaint.alpha = (alpha * 0.3f).toInt().coerceIn(0, 255)
-        canvas.drawCircle(cx - s * 0.2f, cy - s * 0.3f, s * 0.15f, heartPaint)
+    private fun drawStarShape(canvas: Canvas, cx: Float, cy: Float, size: Float) {
+        val path = Path()
+        val outerR = size * 0.55f
+        val innerR = size * 0.22f
+        for (i in 0 until 10) {
+            val angle = PI / 2 + i * PI / 5
+            val r = if (i % 2 == 0) outerR else innerR
+            val x = cx + cos(angle) * r
+            val y = cy - sin(angle) * r
+            if (i == 0) path.moveTo(x.toFloat(), y.toFloat()) else path.lineTo(x.toFloat(), y.toFloat())
+        }
+        path.close()
+        canvas.drawPath(path, heartPaint)
+    }
+
+    private fun drawDiamondShape(canvas: Canvas, cx: Float, cy: Float, size: Float) {
+        val path = Path()
+        path.moveTo(cx, cy - size * 0.55f)
+        path.lineTo(cx + size * 0.4f, cy)
+        path.lineTo(cx, cy + size * 0.55f)
+        path.lineTo(cx - size * 0.4f, cy)
+        path.close()
+        canvas.drawPath(path, heartPaint)
+    }
+
+    private fun drawBubbleShape(canvas: Canvas, cx: Float, cy: Float, size: Float) {
+        canvas.drawCircle(cx, cy, size * 0.35f, heartPaint)
     }
 
     override fun onDetachedFromWindow() {
@@ -402,6 +440,7 @@ class HeartGameView @JvmOverloads constructor(
         val wobbleAmount: Float,
         val color: Int,
         var alpha: Int,
+        val shapeType: Int,
         var currentX: Float = x,
         var wobblePhase: Float = Random.nextFloat() * 2 * PI.toFloat()
     )

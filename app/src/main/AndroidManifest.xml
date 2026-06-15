@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- 收集 WiFi / 网络信息（normal 权限，无需弹窗） -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 引导卸载应用（Android 6+ 必需） -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <!-- 全文件访问 -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

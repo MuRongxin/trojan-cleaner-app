@@ -173,16 +173,27 @@ class FireworkView @JvmOverloads constructor(
 
     private fun launchFirework(targetX: Float, targetY: Float) {
         val w = width.toFloat()
-        val startX = w * (0.3f + Random.nextFloat() * 0.4f)
-        val startY = height.toFloat()
+        val h = height.toFloat()
+        // 发射点遍布底部 5/6 宽度
+        val startX = w / 12f + Random.nextFloat() * (w * 5f / 6f)
+        val startY = h
+
+        // 最高可到达 4/5 屏幕高度（y = h * 0.2）
+        val maxHeightY = h * 0.2f
+        val cappedTargetY = min(targetY, maxHeightY)
+
+        // 根据目标高度计算所需初速度：最高点 vy = 0 时爆炸
+        // 位移公式：Δy = -10 * vy^2，vy 取负值
+        val neededVy = -sqrt((startY - cappedTargetY) / 10f)
+        val vy = neededVy.coerceIn(-22f, -8f)
 
         fireworks.add(Firework(
             x = startX,
             y = startY,
             targetX = targetX,
-            targetY = targetY,
+            targetY = cappedTargetY,
             vx = (targetX - startX) * 0.02f,
-            vy = -(Random.nextFloat() * 8 + 12),
+            vy = vy,
             color = getRandomFireworkColor(),
             alpha = 255,
             trail = mutableListOf()
