@@ -30,5 +30,5 @@
     <!-- 危险按钮（不要点） -->
     <string name="title_danger_card">不要看，不要看这里～</string>
     <string name="danger_card_hint">按下就要爆炸！💥💥💥</string>
-    <string name="btn_danger">我便要 按！！！</string>
+    <string name="btn_danger">我就是要 按！！！</string>
 </resources>

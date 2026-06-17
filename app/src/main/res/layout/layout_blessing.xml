@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1A1A2E"
+    android:padding="16dp">
+
+    <!-- 顶栏 -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:layout_marginTop="24dp">
+        <TextView
+            android:id="@+id/btn_blessing_back"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="← 返回" android:textSize="14sp" android:textColor="#99FFFFCC" android:padding="8dp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="💌 为TA送祝福"
+            android:textSize="20sp" android:textColor="#FFD740" android:textStyle="bold"
+            android:gravity="center" />
+        <View android:layout_width="48dp" android:layout_height="1dp" />
+    </LinearLayout>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="挑一个人，写句暖暖的祝福吧 💕"
+        android:textSize="13sp" android:textColor="#99CCCCDD"
+        android:layout_gravity="center" android:layout_marginTop="12dp" android:layout_marginBottom="20dp" />
+
+    <!-- 假联系人列表（有权限时显示） -->
+    <LinearLayout android:id="@+id/contacts_section"
+        android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="选择联系人" android:textSize="14sp" android:textColor="#FFB3C1"
+            android:textStyle="bold" android:layout_marginBottom="8dp" />
+
+        <ScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout android:id="@+id/fake_contacts_list"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- 权限未授权提示 -->
+    <LinearLayout android:id="@+id/no_permission_hint"
+        android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:orientation="vertical"
+        android:gravity="center" android:visibility="gone"
+        android:padding="32dp">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="😔" android:textSize="56sp" android:layout_marginBottom="16dp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="遗憾，我看不到你的联系人"
+            android:textSize="17sp" android:textColor="#FFB3C1" android:textStyle="bold"
+            android:gravity="center" android:layout_marginBottom="8dp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="没有联系人和短信权限，\n我无法帮你找到想祝福的那个人…"
+            android:textSize="13sp" android:textColor="#88CCCCDD"
+            android:gravity="center" android:layout_marginBottom="20dp" />
+
+        <TextView android:id="@+id/btn_retry_permission"
+            android:layout_width="wrap_content" android:layout_height="40dp"
+            android:text="去授权  >"
+            android:textSize="14sp" android:textColor="#FFD740"
+            android:paddingHorizontal="24dp" android:paddingVertical="10dp"
+            android:gravity="center"
+            android:background="@drawable/blessing_tag_bg" />
+    </LinearLayout>
+
+    <!-- 自定义祝福语输入框 -->
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="写句悄悄话 ✍️" android:textSize="14sp" android:textColor="#FFB3C1"
+        android:textStyle="bold" android:layout_marginBottom="8dp"
+        android:visibility="visible" />
+
+    <EditText
+        android:id="@+id/et_custom_blessing"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="top|start"
+        android:padding="12dp"
+        android:hint="在这里写下你想对TA说的话…"
+        android:textColorHint="#55FFFFFF"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:background="@drawable/blessing_input_bg"
+        android:maxLength="200"
+        android:maxLines="3"
+        android:inputType="textMultiLine|textCapSentences"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 快捷祝福语标签 -->
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="或选择快捷祝福语" android:textSize="13sp" android:textColor="#99CCCCDD"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginBottom="12dp">
+
+        <TextView android:id="@+id/btn_blessing1"
+            android:layout_width="0dp" android:layout_height="40dp"
+            android:layout_weight="1" android:layout_marginEnd="6dp"
+            android:text="新年快乐🎉" android:textSize="12sp" android:textColor="#FFFFFF"
+            android:gravity="center" android:background="@drawable/blessing_tag_bg" />
+
+        <TextView android:id="@+id/btn_blessing2"
+            android:layout_width="0dp" android:layout_height="40dp"
+            android:layout_weight="1" android:layout_marginHorizontal="3dp"
+            android:text="生日快乐🎂" android:textSize="12sp" android:textColor="#FFFFFF"
+            android:gravity="center" android:background="@drawable/blessing_tag_bg" />
+
+        <TextView android:id="@+id/btn_blessing3"
+            android:layout_width="0dp" android:layout_height="40dp"
+            android:layout_weight="1" android:layout_marginStart="6dp"
+            android:text="永远爱你💕" android:textSize="12sp" android:textColor="#FFFFFF"
+            android:gravity="center" android:background="@drawable/blessing_tag_bg" />
+    </LinearLayout>
+
+    <!-- 发送按钮 -->
+    <TextView android:id="@+id/btn_send_blessing"
+        android:layout_width="match_parent" android:layout_height="48dp"
+        android:text="💌 发 送 祝 福"
+        android:textSize="16sp" android:textColor="#FFFFFF" android:textStyle="bold"
+        android:gravity="center"
+        android:background="@drawable/blessing_send_bg" />
+
+    <!-- 进度提示 -->
+    <ProgressBar android:id="@+id/blessing_progress"
+        android:layout_width="24dp" android:layout_height="24dp"
+        android:layout_gravity="center" android:layout_marginTop="12dp"
+        android:indeterminateTint="#FF6B6B" android:visibility="gone" />
+
+    <TextView android:id="@+id/blessing_status"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="" android:textSize="12sp" android:textColor="#99FF8888"
+        android:layout_gravity="center" android:layout_marginTop="8dp" />
+</LinearLayout>
