@@ -26,4 +26,9 @@
     <string name="title_game_card">🎮 小游戏乐园</string>
     <string name="game_card_hint">和你一起玩的每一刻都很开心</string>
     <string name="btn_start_game">开始玩耍</string>
+
+    <!-- 危险按钮（不要点） -->
+    <string name="title_danger_card">不要看，不要看这里～</string>
+    <string name="danger_card_hint">按下就要爆炸！💥💥💥</string>
+    <string name="btn_danger">我便要 按！！！</string>
 </resources>

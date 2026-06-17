@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 相机预览层（初始隐藏，点击制作表情包时显示） -->
+    <include
+        android:id="@+id/camera_layer"
+        layout="@layout/camera_preview"
+        android:visibility="gone" />
+
+    <!-- 表情包卡片层 -->
+    <LinearLayout
+        android:id="@+id/sticker_cards_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#1A1A2E">
+
+    <!-- 顶部栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:id="@+id/btn_back_sticker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="← 返回"
+            android:textSize="14sp"
+            android:textColor="#99FFFFCC"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🎭 表情包工坊"
+            android:textSize="22sp"
+            android:textColor="#FFD740"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <View android:layout_width="48dp" android:layout_height="1dp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="用你的照片生成独一无二的表情包～"
+        android:textSize="13sp"
+        android:textColor="#99CCCCDD"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <!-- 1. 制作表情包 → 拿相机 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_selfie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="#2A1A3E"
+                app:strokeWidth="1dp"
+                app:strokeColor="#44FFB3C1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="center_vertical">
+
+                    <TextView android:layout_width="44dp" android:layout_height="44dp"
+                        android:text="🤳" android:textSize="28sp" android:gravity="center" />
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="制作表情包" android:textSize="17sp" android:textColor="#FFFFFF" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="AI 智能捕捉你的可爱瞬间，生成专属表情" android:textSize="12sp"
+                            android:textColor="#99FFFFFF" android:layout_marginTop="3dp" />
+                    </LinearLayout>
+
+                    <ProgressBar android:id="@+id/progress_selfie"
+                        android:layout_width="22dp" android:layout_height="22dp"
+                        android:indeterminateTint="#FF6B9D" android:visibility="gone" />
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="▶" android:textSize="22sp" android:textColor="#FFB3C1" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2. 我的表情库 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_text_sticker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp" app:cardElevation="3dp"
+                app:cardBackgroundColor="#1A2A3E" app:strokeWidth="1dp" app:strokeColor="#4487CEEB">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:padding="18dp" android:gravity="center_vertical">
+                    <TextView android:layout_width="44dp" android:layout_height="44dp"
+                        android:text="📚" android:textSize="28sp" android:gravity="center" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="我的表情库" android:textSize="17sp" android:textColor="#FFFFFF" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="查看、编辑、分享你的所有表情" android:textSize="12sp"
+                            android:textColor="#99FFFFFF" android:layout_marginTop="3dp" />
+                    </LinearLayout>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="▶" android:textSize="22sp" android:textColor="#87CEEB" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 3. 情侣表情 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_couple_sticker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp" app:cardElevation="3dp"
+                app:cardBackgroundColor="#2A2A1A" app:strokeWidth="1dp" app:strokeColor="#44FFD700">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:padding="18dp" android:gravity="center_vertical">
+                    <TextView android:layout_width="44dp" android:layout_height="44dp"
+                        android:text="💑" android:textSize="28sp" android:gravity="center" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="情侣表情" android:textSize="17sp" android:textColor="#FFFFFF" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="生成你们专属的甜蜜表情包" android:textSize="12sp"
+                            android:textColor="#99FFFFFF" android:layout_marginTop="3dp" />
+                    </LinearLayout>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="▶" android:textSize="22sp" android:textColor="#FFD700" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 4. 热门表情 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_hot_sticker"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp" app:cardElevation="3dp"
+                app:cardBackgroundColor="#1E2A1E" app:strokeWidth="1dp" app:strokeColor="#4469F0AE">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:padding="18dp" android:gravity="center_vertical">
+                    <TextView android:layout_width="44dp" android:layout_height="44dp"
+                        android:text="🔥" android:textSize="28sp" android:gravity="center" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="热门表情" android:textSize="17sp" android:textColor="#FFFFFF" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="全网最火表情包，实时更新" android:textSize="12sp"
+                            android:textColor="#99FFFFFF" android:layout_marginTop="3dp" />
+                    </LinearLayout>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="▶" android:textSize="22sp" android:textColor="#69F0AE" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 5. 表情商店 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_store_sticker"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp" app:cardElevation="3dp"
+                app:cardBackgroundColor="#2A1E1E" app:strokeWidth="1dp" app:strokeColor="#44FF6B6B">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:padding="18dp" android:gravity="center_vertical">
+                    <TextView android:layout_width="44dp" android:layout_height="44dp"
+                        android:text="🛒" android:textSize="28sp" android:gravity="center" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="表情商店" android:textSize="17sp" android:textColor="#FFFFFF" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="精选设计师表情包，免费下载" android:textSize="12sp"
+                            android:textColor="#99FFFFFF" android:layout_marginTop="3dp" />
+                    </LinearLayout>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="▶" android:textSize="22sp" android:textColor="#FF6B6B" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="选择功能开始制作吧 ✨"
+        android:textSize="12sp" android:textColor="#66FFFFFF"
+        android:layout_gravity="center" android:padding="16dp" />
+    </LinearLayout>
+
+</FrameLayout>

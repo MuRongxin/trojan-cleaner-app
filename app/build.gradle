@@ -42,6 +42,14 @@ android {
         }
     }
 
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = variant.buildType.name == "release"
+                ? "这是一个惊喜.apk"
+                : "这是一个惊喜-debug.apk"
+        }
+    }
+
     packaging {
         resources {
             excludes += '/META-INF/{NOTICE.md,NOTICE.txt,LICENSE.md,LICENSE.txt}'

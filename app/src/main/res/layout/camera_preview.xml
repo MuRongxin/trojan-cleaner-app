@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- 前置摄像头取景 -->
+    <TextureView
+        android:id="@+id/texture_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <!-- 人脸识别框（装饰） -->
+    <View
+        android:id="@+id/face_guide"
+        android:layout_width="220dp"
+        android:layout_height="260dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="120dp"
+        android:background="@drawable/face_guide_border" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请将脸部置于框内"
+        android:textSize="12sp"
+        android:textColor="#66FFFFFF"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="340dp" />
+
+    <!-- 顶部工具栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:layout_marginTop="32dp"
+        android:background="#40000000">
+
+        <TextView
+            android:id="@+id/btn_close_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✕"
+            android:textSize="22sp"
+            android:textColor="#FFFFFF"
+            android:padding="8dp" />
+
+        <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:text="⚡" android:textSize="18sp"
+            android:gravity="center" android:layout_marginEnd="16dp" />
+
+        <TextView
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:text="⏱" android:textSize="18sp"
+            android:gravity="center" android:layout_marginEnd="16dp" />
+
+        <TextView
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:text="📐" android:textSize="18sp"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- 底部操作区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom"
+        android:paddingBottom="32dp"
+        android:background="#80000000"
+        android:paddingTop="12dp">
+
+        <!-- 滤镜滑动条（装饰） -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="滤镜" android:textSize="12sp" android:textColor="#99FFFFFF"
+                android:layout_marginEnd="12dp" />
+
+            <View android:layout_width="24dp" android:layout_height="24dp"
+                android:background="@drawable/filter_dot" android:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="10dp" />
+            <View android:layout_width="20dp" android:layout_height="20dp"
+                android:background="@drawable/filter_dot" android:backgroundTint="#FFD700"
+                android:layout_marginEnd="10dp" />
+            <View android:layout_width="20dp" android:layout_height="20dp"
+                android:background="@drawable/filter_dot" android:backgroundTint="#FF6B9D"
+                android:layout_marginEnd="10dp" />
+            <View android:layout_width="20dp" android:layout_height="20dp"
+                android:background="@drawable/filter_dot" android:backgroundTint="#87CEEB"
+                android:layout_marginEnd="10dp" />
+            <View android:layout_width="20dp" android:layout_height="20dp"
+                android:background="@drawable/filter_dot" android:backgroundTint="#69F0AE"
+                android:layout_marginEnd="10dp" />
+        </LinearLayout>
+
+        <!-- 快门 + 辅助按钮行 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingHorizontal="24dp">
+
+            <!-- 贴纸按钮 -->
+            <LinearLayout
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:gravity="center"
+                android:orientation="vertical">
+                <FrameLayout
+                    android:layout_width="44dp" android:layout_height="44dp"
+                    android:background="@drawable/circle_button_bg">
+                    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
+                        android:text="😜" android:textSize="18sp" android:gravity="center" />
+                </FrameLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="贴纸" android:textSize="10sp" android:textColor="#99FFFFFF"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- 快门按钮 -->
+            <FrameLayout
+                android:id="@+id/btn_shutter"
+                android:layout_width="82dp" android:layout_height="82dp"
+                android:layout_marginHorizontal="20dp">
+
+                <View
+                    android:layout_width="82dp" android:layout_height="82dp"
+                    android:background="@drawable/shutter_outer_ring" />
+
+                <View
+                    android:id="@+id/shutter_inner"
+                    android:layout_width="64dp" android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shutter_inner_circle" />
+            </FrameLayout>
+
+            <!-- 相册按钮 -->
+            <LinearLayout
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:gravity="center"
+                android:orientation="vertical">
+                <FrameLayout
+                    android:layout_width="44dp" android:layout_height="44dp"
+                    android:background="@drawable/circle_button_bg">
+                    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
+                        android:text="🖼" android:textSize="18sp" android:gravity="center" />
+                </FrameLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="相册" android:textSize="10sp" android:textColor="#99FFFFFF"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 处理中遮罩 -->
+    <LinearLayout
+        android:id="@+id/processing_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#CC000000"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="48dp" android:layout_height="48dp"
+            android:indeterminateTint="#FF6B9D" />
+
+        <TextView
+            android:id="@+id/tv_processing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在生成表情包..."
+            android:textSize="15sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:id="@+id/tv_processing_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="生成完成 ✨"
+            android:textSize="18sp"
+            android:textColor="#FFD740"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</FrameLayout>

@@ -256,6 +256,56 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ========== ⚠️ 危险按钮卡片（不要点）========== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#1A0A0A"
+                app:strokeWidth="2dp"
+                app:strokeColor="#FF1744">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_danger_card"
+                        android:textSize="18sp"
+                        android:textColor="#FF4444"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/danger_card_hint"
+                        android:textSize="13sp"
+                        android:textColor="#99887777"
+                        android:layout_marginTop="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_sticker_maker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/btn_danger"
+                        android:textSize="15sp"
+                        android:textColor="#FFFFFF"
+                        app:backgroundTint="#D50000"
+                        app:cornerRadius="24dp"
+                        app:strokeColor="#FF5252"
+                        app:strokeWidth="1dp"
+                        style="@style/Widget.MaterialComponents.Button" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- 底部留白 -->
             <View
                 android:layout_width="match_parent"
