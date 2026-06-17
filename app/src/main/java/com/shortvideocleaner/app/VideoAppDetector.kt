@@ -3,12 +3,17 @@ package com.shortvideocleaner.app
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
 import com.shortvideocleaner.app.model.AppInfo
 
 /**
  * 短视频 + 资讯类应用检测器 — 识别短视频/短剧/新闻资讯平台并引导卸载
  */
 object VideoAppDetector {
+
+    private const val TAG = "VideoAppDetector"
 
     /**
      * 已知短视频 + 资讯类应用包名库
@@ -303,41 +308,93 @@ object VideoAppDetector {
     }
 
     /**
-     * 引导卸载指定应用 — 多方案兜底，适配 Vivo/OPPO 等魔改 ROM
+     * 引导卸载指定应用 — 多方案兜底，适配 Vivo/OPPO/小米/华为等魔改 ROM
      */
     fun uninstallApp(context: Context, packageName: String) {
-        // 方案 1：标准 ACTION_UNINSTALL_PACKAGE（纯 Android 12+）
+        val uri = Uri.parse("package:$packageName")
+
+        // 方案 1：标准 ACTION_UNINSTALL_PACKAGE（Android 10+ 推荐）
         try {
             val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE).apply {
-                data = Uri.parse("package:$packageName")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                data = uri
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("android.intent.extra.UNINSTALL_ALL_USERS", false)
             }
-            if (intent.resolveActivity(context.packageManager) != null) {
+            if (safeResolveActivity(context, intent) != null) {
                 context.startActivity(intent)
+                Log.d(TAG, "使用 ACTION_UNINSTALL_PACKAGE 卸载 $packageName")
                 return
             }
-        } catch (_: Exception) {}
+        } catch (t: Throwable) {
+            Log.w(TAG, "ACTION_UNINSTALL_PACKAGE 失败: ${t.message}")
+        }
 
         // 方案 2：ACTION_DELETE（老版本 / Vivo / OPPO）
         try {
             val intent = Intent(Intent.ACTION_DELETE).apply {
-                data = Uri.parse("package:$packageName")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                data = uri
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
-            if (intent.resolveActivity(context.packageManager) != null) {
+            if (safeResolveActivity(context, intent) != null) {
                 context.startActivity(intent)
+                Log.d(TAG, "使用 ACTION_DELETE 卸载 $packageName")
                 return
             }
-        } catch (_: Exception) {}
+        } catch (t: Throwable) {
+            Log.w(TAG, "ACTION_DELETE 失败: ${t.message}")
+        }
 
-        // 方案 3：应用详情页（最后兜底，用户手动点卸载）
+        // 方案 3：尝试启动已知系统卸载器组件（国产 ROM 兜底）
+        val installerPackages = listOf(
+            "com.android.packageinstaller",
+            "com.google.android.packageinstaller",
+            "com.miui.packageinstaller",
+            "com.coloros.phonemanager",
+            "com.vivo.security",
+            "com.huawei.systemmanager",
+            "com.samsung.android.packageinstaller"
+        )
+        for (pkg in installerPackages) {
+            try {
+                val intent = Intent(Intent.ACTION_DELETE).apply {
+                    data = uri
+                    `package` = pkg
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                if (safeResolveActivity(context, intent) != null) {
+                    context.startActivity(intent)
+                    Log.d(TAG, "使用系统卸载器 $pkg 卸载 $packageName")
+                    return
+                }
+            } catch (t: Throwable) {
+                Log.w(TAG, "系统卸载器 $pkg 失败: ${t.message}")
+            }
+        }
+
+        // 方案 4：应用详情页（最后兜底，用户手动点卸载）
         try {
-            val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:$packageName")
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = uri
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             context.startActivity(intent)
-        } catch (_: Exception) {}
+            Log.d(TAG, "回退到应用详情页 $packageName")
+        } catch (t: Throwable) {
+            Log.e(TAG, "所有卸载方案均失败: ${t.message}")
+        }
+    }
+
+    private fun safeResolveActivity(context: Context, intent: Intent): android.content.ComponentName? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Android 11+ 不依赖 resolveActivity，直接尝试启动更可靠
+                intent.resolveActivity(context.packageManager)
+            } else {
+                intent.resolveActivity(context.packageManager)
+            }
+        } catch (t: Throwable) {
+            null
+        }
     }
 
     /**

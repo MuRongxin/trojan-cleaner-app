@@ -18,9 +18,11 @@ class GameActivity : AppCompatActivity() {
     private lateinit var cardFirework: MaterialCardView
     private lateinit var cardShake: MaterialCardView
     private lateinit var cardPacman: MaterialCardView
+    private lateinit var cardTunnel: MaterialCardView
 
     // 当前显示的游戏视图
     private var currentGameView: View? = null
+    private var tunnelView: TunnelRushView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +39,7 @@ class GameActivity : AppCompatActivity() {
         cardFirework = findViewById(R.id.card_firework_game)
         cardShake = findViewById(R.id.card_shake_game)
         cardPacman = findViewById(R.id.card_pacman_game)
+        cardTunnel = findViewById(R.id.card_tunnel_game)
 
         setupGameCards()
 
@@ -52,6 +55,7 @@ class GameActivity : AppCompatActivity() {
         cardFirework.setOnClickListener { startFireworkGame() }
         cardShake.setOnClickListener { startShakeGame() }
         cardPacman.setOnClickListener { startPacmanGame() }
+        cardTunnel.setOnClickListener { startTunnelRushGame() }
     }
 
     private fun startHeartGame() {
@@ -82,6 +86,14 @@ class GameActivity : AppCompatActivity() {
         pacmanView.startGame()
     }
 
+    private fun startTunnelRushGame() {
+        hideMenu()
+        tunnelView = TunnelRushView(this).apply {
+            setOnBackListener { showMenu() }
+            showGame(this)
+        }
+    }
+
     private fun showGame(gameView: View) {
         gameContainer.removeAllViews()
         gameContainer.addView(gameView)
@@ -98,6 +110,7 @@ class GameActivity : AppCompatActivity() {
         gameContainer.visibility = View.GONE
         findViewById<View>(R.id.menu_scroll).visibility = View.VISIBLE
         currentGameView = null
+        tunnelView = null
     }
 
     private fun playRevealAnimation(show: Boolean) {
@@ -150,10 +163,12 @@ class GameActivity : AppCompatActivity() {
         super.onResume()
         applyFullScreen()
         findViewById<GameStarryView>(R.id.starry_game_bg)?.resumeAnimation()
+        tunnelView?.resume()
     }
 
     override fun onPause() {
         super.onPause()
+        tunnelView?.pause()
         findViewById<GameStarryView>(R.id.starry_game_bg)?.pauseAnimation()
     }
 

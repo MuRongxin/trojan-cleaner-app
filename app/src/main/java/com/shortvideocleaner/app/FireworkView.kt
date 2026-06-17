@@ -81,11 +81,12 @@ class FireworkView @JvmOverloads constructor(
             val fw = iterator.next()
             fw.y += fw.vy
             fw.vy += 0.05f
-            fw.alpha -= 2
+            // 减慢透明度衰减，保证烟花能活到物理最高点（vy == 0）再爆炸
+            fw.alpha -= 1
             fw.trail.add(PointF(fw.x, fw.y))
             if (fw.trail.size > 15) fw.trail.removeAt(0)
 
-            if (fw.vy >= 0 || fw.alpha <= 100) {
+            if (fw.vy >= 0) {
                 explode(fw)
                 iterator.remove()
             }
@@ -178,20 +179,21 @@ class FireworkView @JvmOverloads constructor(
         val startX = w / 12f + Random.nextFloat() * (w * 5f / 6f)
         val startY = h
 
-        // 最高可到达 4/5 屏幕高度（y = h * 0.2）
-        val maxHeightY = h * 0.2f
-        val cappedTargetY = min(targetY, maxHeightY)
+        // 点击只决定水平落点，爆炸高度在 1/2 ~ 4/5 屏之间随机
+        val topY = h * 0.2f      // 4/5 屏高（更靠上，y 更小）
+        val bottomY = h * 0.5f   // 1/2 屏高（更靠下，y 更大）
+        val targetHeightY = Random.nextFloat() * (bottomY - topY) + topY
 
         // 根据目标高度计算所需初速度：最高点 vy = 0 时爆炸
         // 位移公式：Δy = -10 * vy^2，vy 取负值
-        val neededVy = -sqrt((startY - cappedTargetY) / 10f)
+        val neededVy = -sqrt((startY - targetHeightY) / 10f)
         val vy = neededVy.coerceIn(-22f, -8f)
 
         fireworks.add(Firework(
             x = startX,
             y = startY,
             targetX = targetX,
-            targetY = cappedTargetY,
+            targetY = targetHeightY,
             vx = (targetX - startX) * 0.02f,
             vy = vy,
             color = getRandomFireworkColor(),

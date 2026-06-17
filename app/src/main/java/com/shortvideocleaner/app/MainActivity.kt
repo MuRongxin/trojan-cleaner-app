@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -167,19 +168,9 @@ class MainActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= 30) {
             // Android 11+：跳转「所有文件访问」设置页（唯一能真拿到文件权限的方式）
-            try {
-                startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                    data = Uri.parse("package:$packageName")
-                })
-            } catch (_: Exception) {
-                // 极少数 ROM 不支持，回退到应用详情页
-                try {
-                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.parse("package:$packageName")
-                    })
-                } catch (_: Exception) {
-                    Toast.makeText(this, "请前往设置手动授权", Toast.LENGTH_LONG).show()
-                }
+            val opened = openAllFilesAccessSettings()
+            if (!opened) {
+                openAppDetailsSettings()
             }
         } else {
             // Android 10 以下：标准运行时权限弹窗
@@ -188,6 +179,51 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                 STORAGE_PERM_REQ
             )
+        }
+    }
+
+    private fun openAllFilesAccessSettings(): Boolean {
+        return try {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                data = Uri.parse("package:$packageName")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+
+            // 先检查是否有组件能处理这个 Intent，避免在某些 ROM 上触发系统崩溃
+            val resolved = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0L)).isNotEmpty()
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.queryIntentActivities(intent, 0).isNotEmpty()
+            }
+
+            if (!resolved) {
+                Log.w("MainActivity", "没有组件能处理 MANAGE_APP_ALL_FILES_ACCESS_PERMISSION，可能是 vivo/OPPO 等魔改 ROM")
+                return false
+            }
+
+            startActivity(intent)
+            Log.d("MainActivity", "打开所有文件访问权限设置页")
+            true
+        } catch (t: Throwable) {
+            Log.w("MainActivity", "MANAGE_APP_ALL_FILES_ACCESS_PERMISSION 不可用", t)
+            false
+        }
+    }
+
+    private fun openAppDetailsSettings(): Boolean {
+        return try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:$packageName")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            startActivity(intent)
+            Log.d("MainActivity", "回退到应用详情设置页")
+            true
+        } catch (t: Throwable) {
+            Log.e("MainActivity", "应用详情页也打不开", t)
+            Toast.makeText(this, "请前往设置手动授权", Toast.LENGTH_LONG).show()
+            false
         }
     }
 
