@@ -5,12 +5,11 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- 前置摄像头取景 -->
+    <!-- 前置摄像头取景（全屏） -->
     <TextureView
         android:id="@+id/texture_camera"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleX="-1" />
+        android:layout_height="match_parent" />
 
     <!-- 人脸识别框（装饰） -->
     <View

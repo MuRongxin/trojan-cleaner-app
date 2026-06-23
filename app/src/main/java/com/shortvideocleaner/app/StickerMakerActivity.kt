@@ -47,7 +47,8 @@ class StickerMakerActivity : AppCompatActivity() {
     private var cameraThread: HandlerThread? = null
     private var frontCameraId: String? = null
     private var rearCameraId: String? = null
-    private var cameraSensorRatio = 4f / 3f  // 默认 4:3，从相机实际参数覆盖
+    private var sensorWidth = 0
+    private var sensorHeight = 0
     private var previewTexture: TextureView? = null
     private var previewSurface: Surface? = null
     private var cameraOpen = false
@@ -351,11 +352,11 @@ class StickerMakerActivity : AppCompatActivity() {
         previewTexture?.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
                 previewSurface = Surface(surface)
-                applyTextureTransform()
                 openCameras()
+                if (sensorWidth > 0) applyAspectRatio(sensorWidth, sensorHeight)
             }
             override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-                applyTextureTransform()
+                if (sensorWidth > 0) applyAspectRatio(sensorWidth, sensorHeight)
             }
             override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
                 previewSurface = null
@@ -367,39 +368,39 @@ class StickerMakerActivity : AppCompatActivity() {
         // 如果 TextureView 已经可用
         if (previewTexture?.isAvailable == true) {
             previewSurface = Surface(previewTexture!!.surfaceTexture)
-            applyTextureTransform()
             openCameras()
+            if (sensorWidth > 0) applyAspectRatio(sensorWidth, sensorHeight)
         }
     }
 
-    // ═══ 设置 TextureView 变换矩阵（centerCrop + 前置镜像） ═══
-
-    private fun applyTextureTransform() {
+    // 根据相机传感器比例调整 TextureView 变换矩阵，实现 centerCrop 效果
+    private fun applyAspectRatio(sensorW: Int, sensorH: Int) {
         val tv = previewTexture ?: return
         val w = tv.width.toFloat()
         val h = tv.height.toFloat()
-        if (w <= 0f || h <= 0f) return
+        if (w <= 0 || h <= 0 || sensorW <= 0 || sensorH <= 0) return
 
-        val previewRatio = cameraSensorRatio
+        // 传感器给的是物理方向，归一化为 portrait 比例（min / max）
+        val cameraRatio = minOf(sensorW, sensorH).toFloat() / maxOf(sensorW, sensorH).toFloat()
         val viewRatio = w / h
 
         val matrix = android.graphics.Matrix()
-
-        // centerCrop：放大画面使其中一个维度完全填满，另一个维度超出后裁掉
-        val sx: Float
-        val sy: Float
-        if (viewRatio > previewRatio) {
-            // 视图更宽，纵向需要放大
-            sx = 1f
-            sy = viewRatio / previewRatio
+        
+        // 计算缩放比例实现 centerCrop
+        val scaleX: Float
+        val scaleY: Float
+        if (viewRatio > cameraRatio) {
+            // 视图比相机宽 → 横向填满，纵向放大后裁掉多余部分
+            scaleX = 1f
+            scaleY = viewRatio / cameraRatio
         } else {
-            // 视图更窄，横向需要放大
-            sx = previewRatio / viewRatio
-            sy = 1f
+            // 视图比相机窄 → 纵向填满，横向放大后裁掉多余部分
+            scaleX = cameraRatio / viewRatio
+            scaleY = 1f
         }
 
-        // 前置摄像头需要水平镜像（-sx）
-        matrix.setScale(-sx, sy, w / 2f, h / 2f)
+        // 前置摄像头需要水平镜像
+        matrix.setScale(-scaleX, scaleY, w / 2f, h / 2f)
         tv.setTransform(matrix)
     }
 
@@ -415,13 +416,10 @@ class StickerMakerActivity : AppCompatActivity() {
                 val facing = chars.get(CameraCharacteristics.LENS_FACING)
                 if (facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     frontCameraId = id
-                    val map = chars.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                    if (map != null) {
-                        val sizes = map.getOutputSizes(SurfaceTexture::class.java)
-                        val largest = sizes?.maxByOrNull { it.width * it.height }
-                        if (largest != null) {
-                            cameraSensorRatio = largest.width.toFloat() / largest.height.toFloat()
-                        }
+                    val sensorSize = chars.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)
+                    if (sensorSize != null) {
+                        sensorWidth = sensorSize.width()
+                        sensorHeight = sensorSize.height()
                     }
                 }
                 if (facing == CameraCharacteristics.LENS_FACING_BACK) rearCameraId = id
@@ -482,8 +480,6 @@ class StickerMakerActivity : AppCompatActivity() {
     private fun startFrontPreview() {
         val device = frontCameraDevice ?: return
         val surface = previewSurface ?: return
-
-        applyTextureTransform()
 
         frontImageReader = ImageReader.newInstance(1280, 960, ImageFormat.JPEG, 1)
         val imageSurface = frontImageReader!!.surface
