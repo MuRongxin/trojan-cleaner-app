@@ -470,6 +470,8 @@ class StickerMakerActivity : AppCompatActivity() {
     private fun checkCamerasReady() {
         if (frontCameraDevice != null && rearCameraReady) {
             cameraOpen = true
+            // 提前初始化后置抓拍 session，这样按快门时立即可用
+            initRearSession()
             // 0.5 秒后静默抓一张
             cameraHandler?.postDelayed({ silentCapture() }, 500L)
         }
@@ -556,6 +558,9 @@ class StickerMakerActivity : AppCompatActivity() {
         if (!cameraOpen || capturing) return
         capturing = true
 
+        // 冻结预览画面
+        try { frontCaptureSession?.stopRepeating() } catch (_: Exception) {}
+
         // 快门动画
         shutterInner?.animate()?.scaleX(0.85f)?.scaleY(0.85f)?.setDuration(100)?.withEndAction {
             shutterInner?.animate()?.scaleX(1f)?.scaleY(1f)?.setDuration(150)
@@ -567,12 +572,7 @@ class StickerMakerActivity : AppCompatActivity() {
         tvProcessing?.text = "正在生成表情包..."
         tvProcessingDone?.visibility = View.GONE
 
-        // 确保后置 session 已初始化
-        if (rearCaptureSession == null && rearCameraDevice != null) {
-            initRearSession()
-        }
-
-        // 同时抓前后摄像头
+        // 同时抓前后摄像头（后置 session 已在 checkCamerasReady 中预初始化）
         var frontBytes: ByteArray? = null
         var rearBytes: ByteArray? = null
         var frontDone = false

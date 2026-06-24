@@ -23,6 +23,7 @@ class QuoteActivity : AppCompatActivity() {
     private var currentQuoteIndex = 0
     private var uninstallCursor = 0
     private var uninstallAttempted = false
+    private var isAutoUninstalling = false
     private var dialogShown = false
     private var persuasionDialog: AlertDialog? = null
     private var persuasionApps: List<AppInfo> = emptyList()
@@ -40,33 +41,32 @@ class QuoteActivity : AppCompatActivity() {
         "我能否将你比作夏日？\n你比它更可爱、更温婉。",
         "使生如夏花之绚烂，\n死如秋叶之静美。",
         "人生至福，\n就是确信有人爱你。",
-        "多少人爱过你昙花一现的身影，\n以虚伪或真情，\n惟独一人曾爱你那朝圣者的心。",
-        "如果你驯养了我，\n我们就会彼此需要。",
-        "我是天空里的一片云，\n偶尔投影在你的波心。",
-        "世界上最遥远的距离，\n是我站在你面前，\n你却不知道我爱你。",
-        "我爱你，不光因为你的样子，\n还因为和你在一起时，我的样子。",
-        "当你在我身边的时候，\n黑夜也变成了清新的早晨。",
-        "你微微地笑着，不同我说什么话。\n而我觉得，为了这个，\n我已等待很久了。",
-        "一生至少该有一次，\n为了某个人而忘了自己。",
-        "草在结它的种子，\n风在摇它的叶子。\n我们站着，不说话，就十分美好。",
-        "你来人间一趟，\n你要看看太阳，\n和你的心上人，一起走在街上。",
-        "春风十里不如你。",
-        "我想作诗，写雨，写夜的相思，\n写你，写不出。",
-        "不要愁老之将至，\n你老了一定很可爱。",
-        "我一天一天明白你的平凡，\n同时却一天一天愈更深切地爱你。",
-        "月光还是少年的月光，\n九州一色还是李白的霜。",
-        "月色与雪色之间，\n你是第三种绝色。",
-        "醉过才知酒浓，\n爱过才知情重。",
-        "情不知所起，一往而深。",
-        "曾经沧海难为水，\n除却巫山不是云。",
-        "两情若是久长时，\n又岂在朝朝暮暮。",
-        "衣带渐宽终不悔，\n为伊消得人憔悴。",
-        "身无彩凤双飞翼，\n心有灵犀一点通。",
-        "山有木兮木有枝，\n心悦君兮君不知。",
-        "愿我如星君如月，\n夜夜流光相皎洁。",
-        "只愿君心似我心，\n定不负相思意。",
-        "晓看天色暮看云，\n行也思君，坐也思君。",
-        "玲珑骰子安红豆，\n入骨相思知不知。",
+        "恭喜解锁新成就：\n成年人体验卡一张 🎉",
+        "睡了三天三夜才发现，\n原来床可以这么软",
+        "通宵打游戏的感觉，\n久违了",
+        "染个头发、打个耳洞，\n做回自己",
+        "把闹钟关掉，\n睡到自然醒",
+        "以后再也没有人\n收你手机了 📱",
+        "想去哪座城市，\n现在可以自己做主了",
+        "约上最好的朋友，\n做最疯的事",
+        "見たい人に会いに行こう\n（去见想见的人吧）",
+        "Life is like a box of chocolates.\n你永远不知道下一颗是什么味道。",
+        " Carpe diem.\n及时行乐，孩子们。",
+        "有些鸟儿是关不住的，\n它们的羽毛太鲜亮了。",
+        "愿你在我看不到的地方安然无恙，\n愿你的冬天永远不缺暖阳。",
+        "所有大人都曾经是小孩，\n虽然只有少数人记得。",
+        "你好吗？\n我很好。",
+        "如果再也不能见到你，\n祝你早安，午安，晚安。",
+        "我不知道将去何方，\n但我已在路上。",
+        "有人住高楼，有人在深沟，\n有人光万丈，有人一身锈。",
+        "斯人若彩虹，\n遇上方知有。",
+        "念念不忘，\n必有回响。",
+        "要么忙着活，\n要么忙着死。",
+        "你保护世界，\n我保护你。",
+        "世界上有一种鸟是没有脚的，\n它只能一直飞呀飞。",
+        "别让别人告诉你，你成不了才。\n如果你有梦想，就要去捍卫它。",
+        "前面漆黑一片，什么也看不到。\n也不是，天亮后会很美的。",
+        "希望是美好的，\n也许是人间至善，而美好的事物永不消逝。",
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -184,6 +184,7 @@ class QuoteActivity : AppCompatActivity() {
         currentQuoteIndex = 0
         uninstallCursor = 0
         uninstallAttempted = false
+        isAutoUninstalling = false
 
         // 始终展示引言，即使没有检测到可卸载的应用
         showQuote(0)
@@ -205,30 +206,25 @@ class QuoteActivity : AppCompatActivity() {
 
         // 如果没有可卸载的应用，纯粹展示引言，展示 8 条后结束
         if (videoApps.isEmpty()) {
-            if (currentQuoteIndex >= 8) {
-                tvQuote.visibility = View.GONE
-                btnNext.visibility = View.GONE
-                tvAllDone.visibility = View.VISIBLE
+            if (currentQuoteIndex >= quotes.size) {
+                showAllDone()
             } else {
                 showQuote(currentQuoteIndex)
             }
             return
         }
 
-        // 每 2 次触发一次卸载
-        if (currentQuoteIndex > 0 && currentQuoteIndex % 2 == 0 && uninstallCursor < videoApps.size) {
+        // 已经在自动卸载流程中，忽略重复点击
+        if (isAutoUninstalling) return
+
+        // 还有目标应用未处理：点击后开始连续自动卸载
+        if (uninstallCursor < videoApps.size) {
+            isAutoUninstalling = true
+            showQuote(currentQuoteIndex)
             uninstallAttempted = true
             VideoAppDetector.uninstallApp(this, videoApps[uninstallCursor].packageName)
-            return
-        }
-
-        // 所有应用已触发卸载
-        if (uninstallCursor >= videoApps.size) {
-            tvQuote.visibility = View.GONE
-            btnNext.visibility = View.GONE
-            tvAllDone.visibility = View.VISIBLE
         } else {
-            showQuote(currentQuoteIndex)
+            showAllDone()
         }
     }
 
@@ -335,12 +331,34 @@ class QuoteActivity : AppCompatActivity() {
         showQuote(0)
     }
 
+    /** 从系统卸载弹窗返回后，自动推进到下一个目标应用 */
+    private fun continueBatchUninstall() {
+        if (!uninstallAttempted || videoApps.isEmpty()) return
+
+        uninstallAttempted = false
+        uninstallCursor++
+
+        if (uninstallCursor < videoApps.size) {
+            rootView.postDelayed({
+                uninstallAttempted = true
+                VideoAppDetector.uninstallApp(this, videoApps[uninstallCursor].packageName)
+            }, 300)
+        } else {
+            isAutoUninstalling = false
+            showAllDone()
+        }
+    }
+
+    private fun showAllDone() {
+        tvQuote.visibility = View.GONE
+        btnNext.visibility = View.GONE
+        tvAllDone.visibility = View.VISIBLE
+    }
+
     /** cursor 推进后判断是否全部处理完 */
     private fun advanceOrFinish() {
         if (uninstallCursor >= videoApps.size) {
-            tvQuote.visibility = View.GONE
-            btnNext.visibility = View.GONE
-            tvAllDone.visibility = View.VISIBLE
+            showAllDone()
         } else {
             showQuote(currentQuoteIndex)
         }
@@ -361,7 +379,7 @@ class QuoteActivity : AppCompatActivity() {
         super.onResume()
         applyFullScreen()
         findViewById<StarryBackgroundView>(R.id.starry_bg)?.resumeAnimation()
-        checkAndPersuade()
+        continueBatchUninstall()
     }
 
     override fun onPause() {

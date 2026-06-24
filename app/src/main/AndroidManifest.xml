@@ -82,5 +82,9 @@
         <activity
             android:name=".StickerMakerActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".GalleryActivity"
+            android:exported="false" />
     </application>
 </manifest>

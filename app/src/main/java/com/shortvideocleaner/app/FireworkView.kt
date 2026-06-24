@@ -112,18 +112,18 @@ class FireworkView @JvmOverloads constructor(
     }
 
     private fun explode(fw: Firework) {
-        val sparkCount = Random.nextInt(40, 80)
+        val sparkCount = Random.nextInt(60, 110)
         val colors = generateExplosionColors(fw.color)
 
         for (i in 0 until sparkCount) {
             val angle = Random.nextFloat() * 2 * PI
-            val speed = Random.nextFloat() * 6 + 2
+            val speed = Random.nextFloat() * 7 + 2.5f
             sparks.add(Spark(
                 x = fw.x,
                 y = fw.y,
                 vx = (cos(angle) * speed).toFloat(),
                 vy = (sin(angle) * speed).toFloat(),
-                size = Random.nextFloat() * 4 + 2,
+                size = Random.nextFloat() * 6 + 4,
                 color = colors[Random.nextInt(colors.size)],
                 alpha = 255,
                 trail = mutableListOf()
@@ -131,7 +131,7 @@ class FireworkView @JvmOverloads constructor(
         }
 
         // 中心闪光
-        for (i in 0 until 15) {
+        for (i in 0 until 20) {
             val angle = Random.nextFloat() * 2 * PI
             val speed = Random.nextFloat() * 2 + 0.5f
             sparks.add(Spark(
@@ -139,7 +139,7 @@ class FireworkView @JvmOverloads constructor(
                 y = fw.y,
                 vx = (cos(angle) * speed).toFloat(),
                 vy = (sin(angle) * speed).toFloat(),
-                size = Random.nextFloat() * 6 + 3,
+                size = Random.nextFloat() * 8 + 5,
                 color = Color.WHITE,
                 alpha = 200,
                 trail = mutableListOf()
